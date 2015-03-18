@@ -12,6 +12,7 @@ import lib.database as database
 import time
 from lib.api import ruokuai as RK
 import traceback
+import requests
 
 from tornado.options import define, options
 import os, sys
@@ -63,6 +64,13 @@ class Dama2(object):
 
     def notice(self, query_id):
         logging.info('Notice ===[dama2]===,query_id:%s', query_id)
+        url = 'http://115.28.233.13/report.php'
+        post_data = {'id': query_id}
+        response = requests.post(url=url, data=post_data)
+        result = response.json()
+        if result['ret'] == '0':
+            return True
+        return False
 
 
 class ErrorNotice(object):
