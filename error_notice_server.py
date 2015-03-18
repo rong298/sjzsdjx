@@ -14,6 +14,8 @@ from lib.api import ruokuai as RK
 import traceback
 
 from tornado.options import define, options
+import os, sys
+from configobj import ConfigObj
 
 
 define("num_processes", default=1, type=int, help="Starts multiple worker processes")
@@ -51,10 +53,14 @@ dama2 = {
 class ErrorNotice(object):
 
     def __init__(self):
-        self.db = database.Connection(
-            host=_MYSQL_HOST, database=_MYSQL_DATABASE,
-            user=_MYSQL_USER, password=_MYSQL_PASSWORD
-        )
+        root_abspath = os.path.dirname(os.path.abspath(sys.argv[0]))
+        config = ConfigObj(root_abspath + '/config/config_online.ini', encoding='UTF8')
+        self.db = database.Connection(**config['mysql'])
+
+        #self.db = database.Connection(
+        #    host=_MYSQL_HOST, database=_MYSQL_DATABASE,
+        #    user=_MYSQL_USER, password=_MYSQL_PASSWORD
+        #)
 
     def notice_dama2(self, query_id):
         logging.info('Notice ===[dama2]===,query_id:%s', query_id)
