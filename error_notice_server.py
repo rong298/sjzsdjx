@@ -42,12 +42,10 @@ ruokuai = {
 class ErrorNotice(object):
 
     def __init__(self):
-        print '++++++++++++++'
         self.db = database.Connection(
             host=_MYSQL_HOST, database=_MYSQL_DATABASE,
             user=_MYSQL_USER, password=_MYSQL_PASSWORD
         )
-        print '--------------'
 
     def notice_dama2(self, query_id):
         logging.info('Notice ===[dama2]===,query_id:%s', query_id)
@@ -89,7 +87,6 @@ class ErrorNotice(object):
             return False
 
     def start(self):
-        print '==========0001========='
         while True:
             logging.info(u"%s 开始扫描 %s", '='*10, '='*10)
             # 获取错误列表
@@ -99,8 +96,7 @@ class ErrorNotice(object):
 
             for error in errors:
                 affect = self.db.execute_rowcount(
-                    "UPDATE %s SET status=4 WHERE id=%s",
-                    _DAMA_TABLE_NAME,
+                    "UPDATE `dama` SET status=4 WHERE id=%s",
                     error['id']
                 )
                 if affect:
@@ -108,9 +104,10 @@ class ErrorNotice(object):
                     self.notice(error)
 
             logging.info(u"%s 扫描结束 %s", '='*10, '='*10)
-            time.sleep(5)
             if options.logging.lower() == 'debug':
                 break
+
+            time.sleep(5)
 
 def signal_handler(signal, frame):
     logging.warn('You pressed Ctrl+C - or killed me with -2')
@@ -121,7 +118,6 @@ def main():
     tornado.options.parse_command_line()
     if options.num_processes != 1:
         tornado.process.fork_processes(options.num_processes)
-    print '=========='
     ErrorNotice().start()
 
 if __name__ == '__main__':
