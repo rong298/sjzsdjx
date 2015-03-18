@@ -35,7 +35,7 @@ class Dama2Business(BaseBusiness):
         config = self.config
         body_data = {'file_type': str(image_type), 'content': image_content}
         
-        logging.debug(body_data)
+        # logging.debug(body_data)
         logging.debug(config['adepter_url'])
 
         response = requests.post(config['adepter_url'], data=body_data)
