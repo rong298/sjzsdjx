@@ -52,7 +52,7 @@ class RClient(object):
         }
         params.update(self.base_params)
         r = requests.post('http://api.ruokuai.com/reporterror.json',
-                          data=params, headers=self.headers)
+                          data=params, headers=self.headers, timeout=3)
         return r.json()
 
     def post(self):

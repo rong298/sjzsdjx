@@ -11,6 +11,7 @@ import tornado.process
 import lib.database as database
 import time
 from lib.api import ruokuai as RK
+import traceback
 
 from tornado.options import define, options
 
@@ -60,8 +61,14 @@ class ErrorNotice(object):
 
     def notice_ruokuai(self, query_id):
         logging.info('Notice ===[ruokuai]===,query_id:%s', query_id)
-        rc = RK(ruokuai['account'], ruokuai['password'], ruokuai['code'], ruokuai['token'])
-        result = rc.rk_report_error(id)
+
+        try:
+            rc = RK(ruokuai['account'], ruokuai['password'], ruokuai['code'], ruokuai['token'])
+            result = rc.rk_report_error(id)
+        except:
+            logging.error(traceback.format_exc())
+            return False
+
         logging.info("Notice Response[ruokuai]: %s" % result)
         return True
 
@@ -98,12 +105,18 @@ class ErrorNotice(object):
             flag = False
 
         if flag:
-            affect = self.db.execute_rowcount("UPDATE `pass_code_records` SET status=5 WHERE id=%s", error['id'])
+            to_status = 5
+            logging.info('Notice Completed [SUCCESS],query_id:%s', query_id)
         else:
-            affect = self.db.execute_rowcount("UPDATE `pass_code_records` SET status=2 WHERE id=%s", error['id'])
+            to_status = 2
+            logging.info('Notice Completed [FAIL],query_id:%s', query_id)
 
+        affect = self.db.execute_rowcount("UPDATE `pass_code_records` SET status=%s WHERE id=%s", to_status, error['id'])
 
-
+        if affect:
+            logging.info('Update Records [SUCCESS],query_id:%s', query_id)
+        else:
+            logging.info('Update Records [FAIL],query_id:%s', query_id)
 
     def start(self):
         while True:
@@ -113,6 +126,9 @@ class ErrorNotice(object):
                 "SELECT * FROM `pass_code_records` WHERE status=2"
             )
 
+
+            logging.info(u"计划通知[%s]", len(errors))
+            numbers = 0
             for error in errors:
                 affect = self.db.execute_rowcount(
                     "UPDATE `pass_code_records` SET status=4 WHERE id=%s",
@@ -121,8 +137,9 @@ class ErrorNotice(object):
                 if affect:
                     # 通知平台
                     self.notice(error)
+                    numbers = numbers + 1
 
-            logging.info(u"%s 扫描结束 %s", '='*10, '='*10)
+            logging.info(u"扫描结束[%s]", numbers)
             if options.logging.lower() == 'debug':
                 break
 
