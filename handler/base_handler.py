@@ -55,8 +55,7 @@ class BaseHandler(tornado.web.RequestHandler):
             except Exception as e:
                 logging.error(traceback.format_exc())
 
-                self.write(cjson.encode(self._error_page('10002',
-                    traceback.format_exc())))
+                self.write(cjson.encode(self._error_page('10002')))
                 return
         else:
             self.write(cjson.encode(
