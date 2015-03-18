@@ -41,14 +41,48 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def _do_post(self):
         ''' post方法
-        需要子类实现
+        默认的post操作
+        若有特殊需求，则子类自行实现
         '''
-        return
+        params = self.get_argument('params', strip=True, default=None)
+        if params:
+            try:
+                params = cjson.decode(params)
+                if params['method'] == 'query_dama':
+                    self._do_query_dama(params)
+                elif params['method'] == 'error_notice':
+                    self._do_error_notice(params)
+            except Exception as e:
+                logging.error(traceback.format_exc())
+
+                self.write(cjson.encode(self._error_page('10002',
+                    traceback.format_exc())))
+                return
+        else:
+            self.write(cjson.encode(
+                self._error_page('10001')))
+            return
+
+    def _do_error_notice(self, params):
+        sql = (" UPDATE `pass_code_records` "
+            " SET `status`=5 WHERE `id`=%s "
+            ) % (params['params']['query_id'])
+        affected = self.db.execute_rowcount(sql)
+        logging.warn('[Self Frontend] Report Error id:%s row[%s]' % ( 
+            params['params']['query_id'], affected))
+
+        if affected==1:
+            self.write(cjson.encode({'status': 'true', 'data': '1'}))
+        else:
+            self.write(cjson.encode({'status': 'false', 'data': '0'}))
+
 
     _ERROR_CODE={
             '10000': u'打码错误',
             '10001': u'params获取失败',
+            '10002': u'服务器异常',
             }
+
     def _error_page(self, code, message=''):
         result = {
                 'status': 'false',
