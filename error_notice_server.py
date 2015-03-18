@@ -10,7 +10,7 @@ import tornado.process
 #from lib import database
 import lib.database as database
 import time
-from lib.api import ruokuai as RK
+from lib.api.ruokuai import RClient as RK
 import traceback
 import requests
 
