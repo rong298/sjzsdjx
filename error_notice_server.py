@@ -33,41 +33,19 @@ _PLATFORM_RUOKUAI = 'ruokuai'
 _PLATFORM_QN = 'qn_dama'
 _PLATFORM_MANUL = 'manul'
 
-# 若快的账号信息
-ruokuai = {
-    'account': 'yunhu001',
-    'password': 'yur140608',
-    'code': 'yunhu001',
-    'token': '2bc2d023cf3641bda85c476488d30197'
-}
 
-# 打码兔的账号信息
-dama2 = {
-    'account': 'yunhu001',
-    'password': 'yur140608',
-    'code': 'yunhudama2',
-    'token': '0b9c7e07a56c23d53bf9031c305e1fc3'
-}
+ABSPATH = os.path.dirname(os.path.abspath(sys.argv[0]))
+CONFIG_PATH = ABSPATH + '/config'
 
 
-class ErrorNotice(object):
+class RuoKuai(object):
 
     def __init__(self):
-        root_abspath = os.path.dirname(os.path.abspath(sys.argv[0]))
-        config = ConfigObj(root_abspath + '/config/config_online.ini', encoding='UTF8')
-        self.db = database.Connection(**config['mysql'])
+        self.config = ConfigObj(CONFIG_PATH + '/' + _PLATFORM_RUOKUAI + '.ini', encoding='UTF8')
 
-        #self.db = database.Connection(
-        #    host=_MYSQL_HOST, database=_MYSQL_DATABASE,
-        #    user=_MYSQL_USER, password=_MYSQL_PASSWORD
-        #)
-
-    def notice_dama2(self, query_id):
-        logging.info('Notice ===[dama2]===,query_id:%s', query_id)
-
-    def notice_ruokuai(self, query_id):
+    def notice(self, query_id):
+        ruokuai = self.config
         logging.info('Notice ===[ruokuai]===,query_id:%s', query_id)
-
         try:
             rc = RK(ruokuai['account'], ruokuai['password'], ruokuai['code'], ruokuai['token'])
             result = rc.rk_report_error(id)
@@ -78,8 +56,24 @@ class ErrorNotice(object):
         logging.info("Notice Response[ruokuai]: %s" % result)
         return True
 
+class Dama2(object):
+
+    def __init__(self):
+        self.config = ConfigObj(CONFIG_PATH + '/' + _PLATFORM_DAMA2 + '.ini', encoding='UTF8')
+
+    def notice(self, query_id):
+        logging.info('Notice ===[dama2]===,query_id:%s', query_id)
+
+
+class ErrorNotice(object):
+
+    def __init__(self):
+        config = ConfigObj(CONFIG_PATH + '/config_online.ini', encoding='UTF8')
+        self.db = database.Connection(**config['mysql'])
+
     def notice_qn(self, query_id):
         logging.info('Notice ===[qn]===,query_id:%s', query_id)
+        return True
 
     def notice_manul(self, query_id):
         logging.info('Notice ===[manul]===,query_id:%s', query_id)
@@ -97,13 +91,13 @@ class ErrorNotice(object):
         query_id = error['dama_platform_query_id']
 
         if platform == _PLATFORM_DAMA2:
-            flag = self.notice_dama2(query_id)
+            flag = Dama2().notice(query_id=query_id)
 
         elif platform == _PLATFORM_MANUL:
-            flag = self.notice_manul(query_id)
+            flag = self.notice_manul(query_id=query_id)
 
         elif platform == _PLATFORM_RUOKUAI:
-            flag = self.notice_ruokuai(query_id)
+            flag = RuoKuai().notice(query_id=query_id)
 
         elif platform == _PLATFORM_QN:
             flag = self.notice_qn(query_id)
