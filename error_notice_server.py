@@ -10,8 +10,9 @@ import tornado.process
 #from lib import database
 import lib.database as database
 import time
-from lib.api import ruokuai as RK
+from lib.api.ruokuai import RClient as RK
 import traceback
+import requests
 
 from tornado.options import define, options
 import os, sys
@@ -48,13 +49,16 @@ class RuoKuai(object):
         logging.info('Notice ===[ruokuai]===,query_id:%s', query_id)
         try:
             rc = RK(ruokuai['account'], ruokuai['password'], ruokuai['code'], ruokuai['token'])
-            result = rc.rk_report_error(id)
+            result = rc.rk_report_error(query_id)
         except:
             logging.error(traceback.format_exc())
             return False
 
         logging.info("Notice Response[ruokuai]: %s" % result)
-        return True
+        if result['Result'] == '报告成功':
+            return True
+        else:
+            return False
 
 class Dama2(object):
 
@@ -63,6 +67,13 @@ class Dama2(object):
 
     def notice(self, query_id):
         logging.info('Notice ===[dama2]===,query_id:%s', query_id)
+        url = 'http://115.28.233.13/report.php'
+        post_data = {'id': query_id}
+        response = requests.post(url=url, data=post_data)
+        result = response.json()
+        if result['ret'] == '0':
+            return True
+        return False
 
 
 class ErrorNotice(object):
@@ -88,7 +99,7 @@ class ErrorNotice(object):
 
     def notice(self, error):
         platform = error['dama_platform']
-        query_id = error['dama_platform_query_id']
+        query_id = error['dama_token_key']
 
         if platform == _PLATFORM_DAMA2:
             flag = Dama2().notice(query_id=query_id)
@@ -120,14 +131,13 @@ class ErrorNotice(object):
 
     def start(self):
         while True:
-            logging.info(u"%s 开始扫描 %s", '='*10, '='*10)
+            logging.info(u"%s scanning ... %s", '='*10, '='*10)
             # 获取错误列表
             errors = self.db.query(
                 "SELECT * FROM `pass_code_records` WHERE notice_status=1"
             )
 
 
-            logging.info(u"计划通知[%s]", len(errors))
             numbers = 0
             for error in errors:
                 affect = self.db.execute_rowcount(
@@ -139,7 +149,6 @@ class ErrorNotice(object):
                     self.notice(error)
                     numbers = numbers + 1
 
-            logging.info(u"扫描结束[%s]", numbers)
             if options.logging.lower() == 'debug':
                 break
 
