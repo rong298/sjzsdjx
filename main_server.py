@@ -30,7 +30,7 @@ from tornado.options import options
 from lib import database
 from handler.ruokuai_handler import RuokuaiHandler
 
-define("port", default=9000, help="run on the given port", type=int)
+define("port", default=9001, help="run on the given port", type=int)
 define("proc", default=2, help="the number of system processes", type=int)
 define("proxies", default='', help="Proxies for requests")
 define("platform", default='rk', help="rk若快; dm2打码2; qn去哪儿; ma人工")

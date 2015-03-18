@@ -66,8 +66,8 @@ class BaseHandler(tornado.web.RequestHandler):
                 }
         if message:
             result['error']['message'] = message
-        elif code in _ERROR_CODE:
-            result['error']['message'] = _ERROR_CODE[code]
+        elif code in self._ERROR_CODE:
+            result['error']['message'] = self._ERROR_CODE[code]
         else:
             result['error']['message'] = '未知的错误码'
         return result

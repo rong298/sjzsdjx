@@ -19,17 +19,19 @@ import cjson
 import logging
 import traceback
 
+from configobj import ConfigObj
+
 from lib.api.ruokuai import RClient
 from base_biz import BaseBusiness
+import base64
 
 class RuokuaiBusiness(BaseBusiness):
 
-    __init__
 
     _PLATFORM_CODE = 'ruokuai'
 
     def passcode_identify(self, image_content, image_type=6113):
-        config = self._load_config()
+        config = self.config
 
         buffer = base64.b64decode(image_content)
         rc = RClient(config['account'], config['password'], config['code'],
@@ -58,7 +60,7 @@ class RuokuaiBusiness(BaseBusiness):
                 " VALUES "
                 " ('%s') "
                 ) % (
-                        "`, `".join(map(self.any_to_str, record.keys()))
+                        "`, `".join(map(self.any_to_str, record.keys())),
                         "', '".join(map(self.any_to_str, record.values()))
                         )
         id = self.db.execute_lastrowid(sql)
@@ -67,10 +69,4 @@ class RuokuaiBusiness(BaseBusiness):
     def report_error(self, id):
         pass
 
-    def _load_config(self, file_name='/config/ruokuai.ini'):
-        config = ConfigObj( (self.applicable.settings['root_abspath']
-            file_name), encoding='UTF8')
-        return config
-
-
-
+   

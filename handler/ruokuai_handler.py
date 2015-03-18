@@ -19,6 +19,8 @@ import cjson
 import datetime
 import logging
 import traceback
+from biz.ruokuai_biz import RuokuaiBusiness
+from configobj import ConfigObj
 
 from base_handler import BaseHandler
 
@@ -26,11 +28,11 @@ class RuokuaiHandler(BaseHandler):
     
     def post(self):
         params = self.get_argument('params', strip=True, default=None)
-
+	config = self._load_config()
         if params:
             try:
-                rk_biz = RuokuaiBusiness(db=self.db)
-                params = cjson(params)
+                rk_biz = RuokuaiBusiness(db=self.db, config=config)
+                params = cjson.decode(params)
                 if params['method'] == 'query_dama':
                     
                     start_time = datetime.datetime.now()
@@ -48,7 +50,7 @@ class RuokuaiHandler(BaseHandler):
 
 
             except Exception as e:
-                logging.error(traceback.fo)
+                logging.error(traceback.format_exc())
         else:
             self.write(cjson.encode(
                 self._error_page('10001')))
@@ -81,3 +83,11 @@ class RuokuaiHandler(BaseHandler):
         # TODO 直接向打码平台报错
         # TODO  记录错误打码结果
         return self._error_page('10000')
+
+    def _load_config(self, file_name='/config/ruokuai.ini'):
+        config = ConfigObj( 
+            self.application.settings['root_abspath'] + file_name, encoding='UTF8')
+        return config
+
+
+
