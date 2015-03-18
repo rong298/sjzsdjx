@@ -19,23 +19,31 @@ define("num_processes", default=1, type=int, help="Starts multiple worker proces
 define("query_id", default='', type=str, help="code query id")
 
 
-_MYSQL_HOST = '127.0.0.1'
+_MYSQL_HOST = '115.29.108.132'
 _MYSQL_USER = 'root'
-_MYSQL_PASSWORD = '123456'
-_MYSQL_DATABASE = 'dama'
+_MYSQL_PASSWORD = 'kyfw100+'
+_MYSQL_DATABASE = 'pass_code'
 
-_DAMA_TABLE_NAME = 'dama'
 
 _PLATFORM_DAMA2 = 'dama2'
 _PLATFORM_RUOKUAI = 'ruokuai'
 _PLATFORM_QN = 'qn_dama'
 _PLATFORM_MANUL = 'manul'
 
+# 若快的账号信息
 ruokuai = {
-    'account': 'zhoulinhu',
+    'account': 'yunhu001',
     'password': 'yur140608',
-    'code': '28710',
-    'token': '8619c2753332465a9507053de2dedfb6'
+    'code': 'yunhu001',
+    'token': '2bc2d023cf3641bda85c476488d30197'
+}
+
+# 打码兔的账号信息
+dama2 = {
+    'account': 'yunhu001',
+    'password': 'yur140608',
+    'code': 'yunhudama2',
+    'token': '0b9c7e07a56c23d53bf9031c305e1fc3'
 }
 
 
@@ -90,9 +98,9 @@ class ErrorNotice(object):
             flag = False
 
         if flag:
-            affect = self.db.execute_rowcount("UPDATE `dama` SET status=5 WHERE id=%s", error['id'])
+            affect = self.db.execute_rowcount("UPDATE `pass_code_records` SET status=5 WHERE id=%s", error['id'])
         else:
-            affect = self.db.execute_rowcount("UPDATE `dama` SET status=2 WHERE id=%s", error['id'])
+            affect = self.db.execute_rowcount("UPDATE `pass_code_records` SET status=2 WHERE id=%s", error['id'])
 
 
 
@@ -102,12 +110,12 @@ class ErrorNotice(object):
             logging.info(u"%s 开始扫描 %s", '='*10, '='*10)
             # 获取错误列表
             errors = self.db.query(
-                "SELECT * FROM `dama` WHERE status=2"
+                "SELECT * FROM `pass_code_records` WHERE status=2"
             )
 
             for error in errors:
                 affect = self.db.execute_rowcount(
-                    "UPDATE `dama` SET status=4 WHERE id=%s",
+                    "UPDATE `pass_code_records` SET status=4 WHERE id=%s",
                     error['id']
                 )
                 if affect:
