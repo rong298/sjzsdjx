@@ -49,13 +49,16 @@ class RuoKuai(object):
         logging.info('Notice ===[ruokuai]===,query_id:%s', query_id)
         try:
             rc = RK(ruokuai['account'], ruokuai['password'], ruokuai['code'], ruokuai['token'])
-            result = rc.rk_report_error(id)
+            result = rc.rk_report_error(query_id)
         except:
             logging.error(traceback.format_exc())
             return False
 
         logging.info("Notice Response[ruokuai]: %s" % result)
-        return True
+        if result['Result'] == '报告成功':
+            return True
+        else:
+            return False
 
 class Dama2(object):
 
@@ -128,14 +131,13 @@ class ErrorNotice(object):
 
     def start(self):
         while True:
-            logging.info(u"%s 开始扫描 %s", '='*10, '='*10)
+            logging.info(u"%s scanning ... %s", '='*10, '='*10)
             # 获取错误列表
             errors = self.db.query(
                 "SELECT * FROM `pass_code_records` WHERE notice_status=1"
             )
 
 
-            logging.info(u"计划通知[%s]", len(errors))
             numbers = 0
             for error in errors:
                 affect = self.db.execute_rowcount(
@@ -147,7 +149,6 @@ class ErrorNotice(object):
                     self.notice(error)
                     numbers = numbers + 1
 
-            logging.info(u"扫描结束[%s]", numbers)
             if options.logging.lower() == 'debug':
                 break
 
