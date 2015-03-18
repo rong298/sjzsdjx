@@ -17,6 +17,7 @@
 
 import random
 import logging
+import datetime
 import traceback
 
 import cjson
@@ -52,7 +53,8 @@ class RuokuaiBusiness(BaseBusiness):
                 'query_address': remote_ip,
                 'start_time': str(start_time),
                 'end_time': str(end_time),
-                'result': cjson.encode(result)
+                'result': cjson.encode(result),
+                'created': str(datetime.datetime.now())
                 }
 
         sql = ("INSERT INTO `pass_code_records`"

@@ -18,6 +18,7 @@
 import re
 import urllib
 import logging
+import datetime
 import traceback
 
 import cjson
@@ -57,7 +58,8 @@ class Dama2Business(BaseBusiness):
                 'query_address': remote_ip,
                 'start_time': str(start_time),
                 'end_time': str(end_time),
-                'result': result
+                'result': result,
+                'created': str(datetime.datetime.now())
                 }
 
         sql = ("INSERT INTO `pass_code_records`"

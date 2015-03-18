@@ -46,8 +46,8 @@ class BaseHandler(tornado.web.RequestHandler):
         return
 
     _ERROR_CODE={
-            '10000': '打码错误',
-            '10001': 'params获取失败',
+            '10000': u'打码错误',
+            '10001': u'params获取失败',
             }
     def _error_page(self, code, message=''):
         result = {
