@@ -28,7 +28,7 @@ from tornado.options import define
 from tornado.options import options
 
 from lib import database
-from handler import *
+from handler.ruokuai_handler import RuokuaiHandler
 
 define("port", default=9000, help="run on the given port", type=int)
 define("proc", default=2, help="the number of system processes", type=int)
@@ -47,7 +47,8 @@ class Application(tornado.web.Application):
                 os.path.abspath(sys.argv[0]))
         web_root = os.path.dirname(__file__)
 
-        config = ConfigObj(root_abspath + '/config/config_online.ini')
+        config = ConfigObj(root_abspath + '/config/config_online.ini',
+                encoding='UTF8')
 
         logging.debug(config)
 

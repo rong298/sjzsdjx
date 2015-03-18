@@ -54,10 +54,3 @@ class RClient(object):
         r = requests.post('http://api.ruokuai.com/reporterror.json',
                           data=params, headers=self.headers)
         return r.json()
-
-    def post(self):
-        result = rc.rk_report_error(id)
-        logging.info('Result: %s' % result)
-        logging.info("Error Report Result: %s" % (result))
-
-

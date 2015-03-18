@@ -16,10 +16,11 @@
 # under the License.
 
 import cjson
+import datetime
 import logging
 import traceback
 
-from handler import BaseHandler
+from base_handler import BaseHandler
 
 class RuokuaiHandler(BaseHandler):
     
@@ -28,9 +29,55 @@ class RuokuaiHandler(BaseHandler):
 
         if params:
             try:
+                rk_biz = RuokuaiBusiness(db=self.db)
                 params = cjson(params)
+                if params['method'] == 'query_dama':
+                    
+                    start_time = datetime.datetime.now()
+                    result = rk_biz.passcode_identify(params['params']['content'],
+                            6113) # TODO params['params']['image_type']
+                    end_time =  datetime.datetime.now()
+
+                    # 记录打码结果
+                    id = rk_biz.insert_record(params, result, start_time, end_time,
+                            self.request.remote_ip)
+                    
+                    context = self._parse_result(id, result)
+                    self.write(cjson.encode(context))
+                    return
+
+
             except Exception as e:
                 logging.error(traceback.fo)
         else:
-            self._error_page('10001')
+            self.write(cjson.encode(
+                self._error_page('10001')))
             return
+
+    def _parse_result(self, id, result):
+        if 'Error_Code' in result:
+            # TODO 直接向打码平台报错
+            # TODO  记录错误打码结果
+            return self._error_page('10000')
+            
+        code = response.json()['Result']
+        logging.debug(code)
+        if (code.isdigit() and len(code)<8 and
+                '9' not in code and '0' not in code):
+
+            result = []
+            for p in str(code):
+                result.append(random.choice(self._CODE_POSITION[p]))
+
+            # 返回适配好的打码结果
+            return {
+                    'status': 'true',
+                    'data': {
+                        'query_id': str(id),    #数据库自增ID
+                        'dama_platform': RuokuaiBusiness._PLATFORM_CODE, #打码平台标示
+                        'pass_code': ','.join(result),    #验证码坐标    
+                        }
+                    }
+        # TODO 直接向打码平台报错
+        # TODO  记录错误打码结果
+        return self._error_page('10000')

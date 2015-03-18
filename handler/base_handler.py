@@ -18,6 +18,14 @@ import tornado.web
 
 class BaseHandler(tornado.web.RequestHandler):
 
+    _CODE_POSITION = {'1': ['37,45','33,42','43,47','38,44'],
+            '2': ['109,49','111,34','108,43','101,46'], 
+            '3': ['199,45','169,41','190,39','180,41'], 
+            '4': ['255,43','258,39','265,34','257,43'], 
+            '5': ['41,114','41,112','38,110','44,113'], 
+            '6': ['112,124','126,110','117,118','110,123'], 
+            '7': ['186,119','171,115','192,118','191,118'], 
+            '8': ['257,109','253,116','242,107','265,122']} 
     @property
     def db(self):
         return self.application.db
@@ -62,4 +70,4 @@ class BaseHandler(tornado.web.RequestHandler):
             result['error']['message'] = _ERROR_CODE[code]
         else:
             result['error']['message'] = '未知的错误码'
-        self.write(cjson.encode(result))
+        return result
