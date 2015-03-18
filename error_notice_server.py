@@ -96,7 +96,7 @@ class ErrorNotice(object):
 
     def notice(self, error):
         platform = error['dama_platform']
-        query_id = error['dama_platform_query_id']
+        query_id = error['dama_token_key']
 
         if platform == _PLATFORM_DAMA2:
             flag = Dama2().notice(query_id=query_id)
