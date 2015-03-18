@@ -78,7 +78,7 @@ class ErrorNotice(object):
     def notice_manul(self, query_id):
         logging.info('Notice ===[manul]===,query_id:%s', query_id)
         affect = self.db.execute_rowcount(
-            "UPDATE `pass_code` SET `status`=3 WHERE search_key=%s", query_id
+            "UPDATE `pass_code` SET `flag`=2 WHERE `id`=%s", query_id
         )
         if affect:
             logging.info('Notice Response[manul]:%s', affect)
@@ -105,13 +105,13 @@ class ErrorNotice(object):
             flag = False
 
         if flag:
-            to_status = 5
+            to_status = 3
             logging.info('Notice Completed [SUCCESS],query_id:%s', query_id)
         else:
-            to_status = 2
+            to_status = 4
             logging.info('Notice Completed [FAIL],query_id:%s', query_id)
 
-        affect = self.db.execute_rowcount("UPDATE `pass_code_records` SET status=%s WHERE id=%s", to_status, error['id'])
+        affect = self.db.execute_rowcount("UPDATE `pass_code_records` SET notice_status=%s WHERE id=%s", to_status, error['id'])
 
         if affect:
             logging.info('Update Records [SUCCESS],query_id:%s', query_id)
@@ -123,7 +123,7 @@ class ErrorNotice(object):
             logging.info(u"%s 开始扫描 %s", '='*10, '='*10)
             # 获取错误列表
             errors = self.db.query(
-                "SELECT * FROM `pass_code_records` WHERE status=2"
+                "SELECT * FROM `pass_code_records` WHERE notice_status=1"
             )
 
 
@@ -131,7 +131,7 @@ class ErrorNotice(object):
             numbers = 0
             for error in errors:
                 affect = self.db.execute_rowcount(
-                    "UPDATE `pass_code_records` SET status=4 WHERE id=%s",
+                    "UPDATE `pass_code_records` SET notice_status=2 WHERE id=%s",
                     error['id']
                 )
                 if affect:
