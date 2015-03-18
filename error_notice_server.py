@@ -152,7 +152,7 @@ class ErrorNotice(object):
             if options.logging.lower() == 'debug':
                 break
 
-            time.sleep(5)
+            time.sleep(1)
 
 def signal_handler(signal, frame):
     logging.warn('You pressed Ctrl+C - or killed me with -2')
