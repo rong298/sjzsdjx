@@ -55,6 +55,7 @@ class ErrorNotice(object):
         rc = RK(ruokuai['account'], ruokuai['password'], ruokuai['code'], ruokuai['token'])
         result = rc.rk_report_error(id)
         logging.info("Notice Response[ruokuai]: %s" % result)
+        return True
 
     def notice_qn(self, query_id):
         logging.info('Notice ===[qn]===,query_id:%s', query_id)
@@ -66,25 +67,35 @@ class ErrorNotice(object):
         )
         if affect:
             logging.info('Notice Response[manul]:%s', affect)
+            return True
+
+        return False
 
     def notice(self, error):
         platform = error['dama_platform']
         query_id = error['dama_platform_query_id']
 
         if platform == _PLATFORM_DAMA2:
-            self.notice_dama2(query_id)
+            flag = self.notice_dama2(query_id)
 
         elif platform == _PLATFORM_MANUL:
-            self.notice_manul(query_id)
+            flag = self.notice_manul(query_id)
 
         elif platform == _PLATFORM_RUOKUAI:
-            self.notice_ruokuai(query_id)
+            flag = self.notice_ruokuai(query_id)
 
         elif platform == _PLATFORM_QN:
-            self.notice_qn(query_id)
-
+            flag = self.notice_qn(query_id)
         else:
-            return False
+            flag = False
+
+        if flag:
+            affect = self.db.execute_rowcount("UPDATE `dama` SET status=5 WHERE id=%s", error['id'])
+        else:
+            affect = self.db.execute_rowcount("UPDATE `dama` SET status=2 WHERE id=%s", error['id'])
+
+
+
 
     def start(self):
         while True:
