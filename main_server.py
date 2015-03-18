@@ -28,19 +28,25 @@ from tornado.options import define
 from tornado.options import options
 
 from lib import database
+from timer.main_processor_checker import MainProcessorChecker
 from handler.ruokuai_handler import RuokuaiHandler
+from handler.dama2_handler import Dama2Handler
 
 define("port", default=9001, help="run on the given port", type=int)
 define("proc", default=2, help="the number of system processes", type=int)
 define("proxies", default='', help="Proxies for requests")
-define("platform", default='rk', help="rk若快; dm2打码2; qn去哪儿; ma人工")
+define("platform", default='ruokuai', help="ruokuai若快; dama2 打码2; qn_dama去哪儿; manul人工")
 
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = []
-        if options.platform == 'ma':
+        if options.platform == 'manul':
             handlers.append((r"/dama[/]?", ManualPasscodeHandler))
-        elif options.platform == 'rk':
+        elif options.platform == 'ruokuai':
+            handlers.append((r"/dama[/]?", RuokuaiHandler))
+        elif options.platform == 'dama2':
+            handlers.append((r"/dama[/]?", Dama2Handler))
+        elif options.platform == 'ruokuai':
             handlers.append((r"/dama[/]?", RuokuaiHandler))
 
         root_abspath = os.path.dirname(
@@ -82,6 +88,8 @@ def main():
     http_server = tornado.httpserver.HTTPServer(Application())
     http_server.bind(options.port)
     http_server.start(options.proc)
+
+    MainProcessorChecker().start()
     tornado.ioloop.IOLoop.instance().start()
 
 if __name__ == "__main__":

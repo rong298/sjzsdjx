@@ -19,32 +19,31 @@ import cjson
 import datetime
 import logging
 import traceback
-from biz.ruokuai_biz import RuokuaiBusiness
-from configobj import ConfigObj
+from biz.dama2_biz import Dama2Business
 
 from base_handler import BaseHandler
 
-class RuokuaiHandler(BaseHandler):
+class Dama2Handler(BaseHandler):
     
     def post(self):
         params = self.get_argument('params', strip=True, default=None)
-        config = self._load_config('/config/%s.ini' % RuokuaiBusiness._PLATFORM_CODE)
+        config = self._load_config('/config/%s.ini' % Dama2Business._PLATFORM_CODE)
         if params:
             try:
-                rk_biz = RuokuaiBusiness(db=self.db, config=config)
+                dm2_biz = Dama2Business(db=self.db, config=config)
                 params = cjson.decode(params)
                 if params['method'] == 'query_dama':
                     
                     start_time = datetime.datetime.now()
-                    result = rk_biz.passcode_identify(params['params']['content'],
+                    result = dm2_biz.passcode_identify(params['params']['content'],
                             config['image_type'])
                     end_time =  datetime.datetime.now()
 
                     # 记录打码结果
-                    id = rk_biz.insert_record(params, result, start_time, end_time,
+                    id = dm2_biz.insert_record(params, result, start_time, end_time,
                             self.request.remote_ip)
                     
-                    context = rk_biz.parse_result(id, result)
+                    context = dm2_biz.parse_result(id, result)
 
                     # 返回成功
                     if context:
@@ -61,11 +60,3 @@ class RuokuaiHandler(BaseHandler):
             self.write(cjson.encode(
                 self._error_page('10001')))
             return
-
-    def _load_config(self, file_name='/config/ruokuai.ini'):
-        config = ConfigObj( 
-            self.application.settings['root_abspath'] + file_name, encoding='UTF8')
-        return config
-
-
-
