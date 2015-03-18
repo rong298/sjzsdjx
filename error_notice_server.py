@@ -55,7 +55,7 @@ class RuoKuai(object):
             return False
 
         logging.info("Notice Response[ruokuai]: %s" % result)
-        if result['Result'] == '报告成功':
+        if result['Result'] == u'报告成功':
             return True
         else:
             return False
@@ -152,7 +152,7 @@ class ErrorNotice(object):
             if options.logging.lower() == 'debug':
                 break
 
-            time.sleep(5)
+            time.sleep(1)
 
 def signal_handler(signal, frame):
     logging.warn('You pressed Ctrl+C - or killed me with -2')
