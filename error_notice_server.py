@@ -55,7 +55,7 @@ class RuoKuai(object):
             return False
 
         logging.info("Notice Response[ruokuai]: %s" % result)
-        if result['Result'] == '报告成功':
+        if result['Result'] == u'报告成功':
             return True
         else:
             return False
