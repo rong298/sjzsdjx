@@ -2,17 +2,13 @@
 # -*- coding: utf-8 -*-
 __author__ = 'Jacky'
 
-
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-__author__ = 'Jacky'
-
 import sys
 import signal
 import tornado
 import logging
 import tornado.process
-from lib import database
+#from lib import database
+import lib.database as database
 import time
 from lib.api import ruokuai as RK
 
@@ -46,14 +42,15 @@ ruokuai = {
 class ErrorNotice(object):
 
     def __init__(self):
+        print '++++++++++++++'
         self.db = database.Connection(
-            host=_MYSQL_DATABASE, database=_MYSQL_DATABASE,
+            host=_MYSQL_HOST, database=_MYSQL_DATABASE,
             user=_MYSQL_USER, password=_MYSQL_PASSWORD
         )
+        print '--------------'
 
     def notice_dama2(self, query_id):
         logging.info('Notice ===[dama2]===,query_id:%s', query_id)
-        pass
 
     def notice_ruokuai(self, query_id):
         logging.info('Notice ===[ruokuai]===,query_id:%s', query_id)
@@ -63,7 +60,6 @@ class ErrorNotice(object):
 
     def notice_qn(self, query_id):
         logging.info('Notice ===[qn]===,query_id:%s', query_id)
-        pass
 
     def notice_manul(self, query_id):
         logging.info('Notice ===[manul]===,query_id:%s', query_id)
@@ -74,7 +70,6 @@ class ErrorNotice(object):
             logging.info('Notice Response[manul]:%s', affect)
 
     def notice(self, error):
-
         platform = error['dama_platform']
         query_id = error['dama_platform_query_id']
 
@@ -94,17 +89,17 @@ class ErrorNotice(object):
             return False
 
     def start(self):
-
+        print '==========0001========='
         while True:
             logging.info(u"%s 开始扫描 %s", '='*10, '='*10)
             # 获取错误列表
             errors = self.db.query(
-                "SELECT * FROM `%s` WHERE status=2", _DAMA_TABLE_NAME
+                "SELECT * FROM `dama` WHERE status=2"
             )
 
             for error in errors:
                 affect = self.db.execute_rowcount(
-                    "UPDATE `%s` SET status=4 WHERE id=%s",
+                    "UPDATE %s SET status=4 WHERE id=%s",
                     _DAMA_TABLE_NAME,
                     error['id']
                 )
@@ -126,6 +121,7 @@ def main():
     tornado.options.parse_command_line()
     if options.num_processes != 1:
         tornado.process.fork_processes(options.num_processes)
+    print '=========='
     ErrorNotice().start()
 
 if __name__ == '__main__':
