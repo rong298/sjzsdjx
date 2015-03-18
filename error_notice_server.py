@@ -20,7 +20,7 @@ define("num_processes", default=1, type=int, help="Starts multiple worker proces
 define("query_id", default='', type=str, help="code query id")
 
 
-_MYSQL_HOST = '115.29.108.132'
+_MYSQL_HOST = '127.0.0.1'
 _MYSQL_USER = 'root'
 _MYSQL_PASSWORD = 'kyfw100+'
 _MYSQL_DATABASE = 'pass_code'
