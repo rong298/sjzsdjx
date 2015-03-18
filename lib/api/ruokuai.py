@@ -53,5 +53,5 @@ class RClient(object):
         params.update(self.base_params)
         r = requests.post('http://api.ruokuai.com/reporterror.json',
                           data=params, headers=self.headers, timeout=3)
-        logging.info('ruokuai-response:%s', r.text)
+        #logging.info('ruokuai-response:%s', r.text)
         return
