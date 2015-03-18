@@ -30,17 +30,18 @@ from tornado.options import options
 from lib import database
 from handler import *
 
-
-define("port", default=50000, help="run on the given port", type=int)
+define("port", default=9000, help="run on the given port", type=int)
 define("proc", default=2, help="the number of system processes", type=int)
 define("proxies", default='', help="Proxies for requests")
-define("platform", default='', help="rk若快; dm2打码2; qn去哪儿; ma人工")
+define("platform", default='rk', help="rk若快; dm2打码2; qn去哪儿; ma人工")
 
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = []
         if options.platform == 'ma':
             handlers.append((r"/dama[/]?", ManualPasscodeHandler))
+        elif options.platform == 'rk':
+            handlers.append((r"/dama[/]?", RuokuaiHandler))
 
         root_abspath = os.path.dirname(
                 os.path.abspath(sys.argv[0]))
@@ -74,25 +75,6 @@ class Application(tornado.web.Application):
         self.proxies = {}
         if options.proxies:
             self.proxies = {"https": "http://"+options.proxies}
-
-        # self.redis_config = {
-        #         'host': '115.29,
-        #         'port': 6379,
-        #         'db': 0
-        # }
-
-
-        # self.station_names = dict()
-        # with open('static/station_names.txt') as fp:
-        #     station_str = fp.read()
-        #     station_str = station_str.strip('@')
-        #     for station in station_str.split('@'):
-        #         inf = station.split('|')
-        #         self.station_names[inf[1]] = inf
-
-        # #self.merchantKey = options.merchantKey
-        # self.merchantCode = options.tts_code
-        # self.js_engine = JSEngine()
 
 def main():
     tornado.options.parse_command_line()
