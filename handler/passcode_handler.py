@@ -112,6 +112,7 @@ class ManualPasscodeHandler(BaseHandler):
         #image_content = self.get_argument('file_data', strip=True, default=None)
 
         # 参数解析
+        params = params['params']
         seller_platform = params['seller_platform']
         seller = params['seller']
         content = params['content']
@@ -124,7 +125,7 @@ class ManualPasscodeHandler(BaseHandler):
             self.write(result['result'])
             return
         if content:
-            file_path = ('%s/runtime' % root_abspath, search_key)
+            file_path = ('%s/runtime/%' % (root_abspath, search_key))
             with open(file_path, 'wb') as image_file:
                 image_file.write(base64.b64decode(content))
 
