@@ -62,7 +62,7 @@ class ManualPasscodeHandler(BaseHandler):
                     "UPDATE `pass_code` SET `status`=3, `result`='%s', `operator`='%s' WHERE `search_key`='%s'" % (
                         passvalue1, user_name, search_key)
                     )
-            self.redirect('/admin/manual_passcode')
+            self.redirect('/dama')
             return
 
         total = self.db.get("SELECT count(*) as total FROM `pass_code` WHERE status=1")
@@ -114,16 +114,16 @@ class ManualPasscodeHandler(BaseHandler):
         seller_platform = params['seller_platform']
         seller = params['seller']
         content = params['content']
-        image_type = params['image_type']
         search_key = self._md5(content)
 
         result = local_db.get("SELECT * FROM `pass_code` WHERE `search_key`='%s'" % search_key)
 
         if result and result['result'] and result['flag'] == 1:
-            self.write(result['result'])
+            logging.debug("====>%s", result)
+            self.parse_result(result['result'])
             return
         if content:
-            file_path = ('%s/runtime/images/%s' % (root_abspath, search_key))
+            file_path = ('%s/static/passcode_file/%s' % (root_abspath, search_key))
             with open(file_path, 'wb') as image_file:
                 image_file.write(base64.b64decode(content))
 
@@ -136,7 +136,7 @@ class ManualPasscodeHandler(BaseHandler):
         affect = local_db.execute_rowcount(sql)
 
         loop_times = 0
-        result = []
+        hit_numbers = ''
         flag = True
         code_position = BaseBusiness._CODE_POSITION
         while affect:
@@ -152,9 +152,7 @@ class ManualPasscodeHandler(BaseHandler):
                 hit_numbers = ret['result']
 
                 for p in hit_numbers:
-                    if p in code_position:
-                        result.append(code_position[p])
-                    else:
+                    if p not in code_position:
                         # self.write(cjson.encode(self._error_page('10000')))
                         local_db.execute_rowcount(
                             "UPDATE `pass_code` SET flag=2 WHERE search_key=%s LIMIT 1", search_key
@@ -163,23 +161,35 @@ class ManualPasscodeHandler(BaseHandler):
                         break
                 break
             time.sleep(1)
-
+        
+        logging.debug("%s,%s", flag, result)
         if flag:
             # 成功
-            codes = ",".join(result)
-            ret = {
-                'status': 'true',
-                'data': {
-                    'query_id': '100',
-                    'dama_platform': 'manul',
-                    'pass_code': codes
-                }
-            }
-
-            self.write(cjson.encode(ret))
+            logging.debug("=SUC===>%s", result)
+            self.parse_result(hit_numbers)
         else:
             self.write(cjson.encode(self._error_page('10000')))
 
         local_db.close()
         return
+    def parse_result(self, hit_numbers):
+        result = []
+        code_position = BaseBusiness._CODE_POSITION
+        for p in hit_numbers:
+            result.append(random.choice(code_position[p]))
+
+        logging.debug("==CODE==>%s", result)
+
+        ret = {
+                'status': 'true',
+                'data': {
+                    'query_id': '100',
+                    'dama_platform': 'manul',
+                    'pass_code': ','.join(result)
+                    }
+                }
+        self.write(cjson.encode(ret))
+        return 
+
+
 

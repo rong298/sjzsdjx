@@ -44,7 +44,6 @@ class Application(tornado.web.Application):
         handlers = []
         if options.platform == 'manul':
             handlers.append((r"/dama[/]?", ManualPasscodeHandler))
-            handlers.append((r"/admin/manual_passcode[/]?", ManualPasscodeHandler))
         elif options.platform == 'ruokuai':
             handlers.append((r"/dama[/]?", RuokuaiHandler))
         elif options.platform == 'dama2':
