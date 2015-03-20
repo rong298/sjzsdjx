@@ -22,7 +22,6 @@ import csv
 import time
 import json
 import uuid
-import utils
 import codecs
 import logging
 import urllib
@@ -39,7 +38,6 @@ from biz.base_biz import BaseBusiness
 import cjson
 
 from MySQLdb import IntegrityError
-from lxml import etree
 
 from base_handler import BaseHandler
 
