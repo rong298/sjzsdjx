@@ -35,6 +35,7 @@ class RuokuaiBusiness(BaseBusiness):
         config = self.config
 
         buffer = base64.b64decode(image_content)
+        logging.info("ACCOUNT:%s-%s-%s-%s" % (config['account'],config['code'],str(image_type),config['token']))
         rc = RClient(config['account'], config['password'], config['code'],
                 config['token'])
         result = rc.rk_create(buffer, image_type) # 3040 6113 
