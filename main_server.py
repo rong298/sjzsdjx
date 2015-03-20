@@ -32,6 +32,8 @@ from timer.main_processor_checker import MainProcessorChecker
 from handler.ruokuai_handler import RuokuaiHandler
 from handler.dama2_handler import Dama2Handler
 
+from handler.passcode_handler import ManualPasscodeHandler
+
 define("port", default=9001, help="run on the given port", type=int)
 define("proc", default=2, help="the number of system processes", type=int)
 define("proxies", default='', help="Proxies for requests")
