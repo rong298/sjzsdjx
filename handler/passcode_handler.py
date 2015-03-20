@@ -125,7 +125,7 @@ class ManualPasscodeHandler(BaseHandler):
             self.write(result['result'])
             return
         if content:
-            file_path = ('%s/runtime/%' % (root_abspath, search_key))
+            file_path = ('%s/runtime/%s' % (root_abspath, search_key))
             with open(file_path, 'wb') as image_file:
                 image_file.write(base64.b64decode(content))
 
