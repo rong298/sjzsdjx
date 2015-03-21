@@ -32,7 +32,7 @@ from timer.main_processor_checker import MainProcessorChecker
 from handler.ruokuai_handler import RuokuaiHandler
 from handler.dama2_handler import Dama2Handler
 
-from handler.passcode_handler import ManualPasscodeHandler
+from handler.manul_handler import ManulHandler
 
 define("port", default=9001, help="run on the given port", type=int)
 define("proc", default=2, help="the number of system processes", type=int)
@@ -46,7 +46,7 @@ class Application(tornado.web.Application):
     def __init__(self):
         handlers = []
         if options.platform == 'manul':
-            handlers.append((r"/dama[/]?", ManualPasscodeHandler))
+            handlers.append((r"/dama[/]?", ManulHandler))
         elif options.platform == 'ruokuai':
             handlers.append((r"/dama[/]?", RuokuaiHandler))
         elif options.platform == 'dama2':
