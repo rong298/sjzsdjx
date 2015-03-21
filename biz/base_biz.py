@@ -9,6 +9,7 @@ Create on 2014-08-12
 
 import os
 import sys
+import hashlib
 
 
 import socket
@@ -33,6 +34,7 @@ class BaseBusiness(object):
     def __init__(self, **kargs):
         self.db = kargs.get('db', None)
         self.config = kargs.get('config', None)
+        self.app_config = kargs.get('app_config', None)
 
     def get_local_ip(self, ifname): 
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
@@ -44,4 +46,10 @@ class BaseBusiness(object):
         if not isinstance(value, unicode):
             return str(value)
         return value
+
+    def _md5(self, src):
+        myMd5 = hashlib.md5()
+        myMd5.update(src)
+        myMd5_Digest = myMd5.hexdigest()
+        return myMd5_Digest
 

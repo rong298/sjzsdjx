@@ -189,7 +189,7 @@ class ManualPasscodeHandler(BaseHandler):
                     }
                 }
         self.write(cjson.encode(ret))
-        return 
+        return
 
 
 
