@@ -8,6 +8,7 @@ Create on 2014-08-12
 '''
 
 import os
+
 import sys
 
 import logging
@@ -15,6 +16,7 @@ import traceback
 
 import cjson
 import tornado.web
+import hashlib
 from configobj import ConfigObj
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -102,4 +104,10 @@ class BaseHandler(tornado.web.RequestHandler):
         config = ConfigObj( 
             self.application.settings['root_abspath'] + file_name, encoding='UTF8')
         return config
+
+    def _md5(self, src):
+        myMd5 = hashlib.md5()
+        myMd5.update(src)
+        myMd5_Digest = myMd5.hexdigest()
+        return myMd5_Digest
 

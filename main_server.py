@@ -32,10 +32,15 @@ from timer.main_processor_checker import MainProcessorChecker
 from handler.ruokuai_handler import RuokuaiHandler
 from handler.dama2_handler import Dama2Handler
 
+from handler.passcode_handler import ManualPasscodeHandler
+
 define("port", default=9001, help="run on the given port", type=int)
 define("proc", default=2, help="the number of system processes", type=int)
 define("proxies", default='', help="Proxies for requests")
 define("platform", default='ruokuai', help="ruokuai若快; dama2 打码2; qn_dama去哪儿; manul人工")
+
+ABS_ROOT_PATH = os.path.dirname(os.path.abspath(sys.argv[0]))
+STATIC_PATH = ABS_ROOT_PATH + "/static"
 
 class Application(tornado.web.Application):
     def __init__(self):

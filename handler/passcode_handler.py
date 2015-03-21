@@ -22,7 +22,6 @@ import csv
 import time
 import json
 import uuid
-import utils
 import codecs
 import logging
 import urllib
@@ -32,11 +31,15 @@ import datetime
 import traceback
 import tornado.web
 import base64
+from lib import database
+from configobj import ConfigObj
+
+from biz.base_biz import BaseBusiness
+import cjson
 
 from MySQLdb import IntegrityError
-from lxml import etree
 
-from handler import BaseHandler
+from base_handler import BaseHandler
 
 class ManualPasscodeHandler(BaseHandler):
     
@@ -59,7 +62,7 @@ class ManualPasscodeHandler(BaseHandler):
                     "UPDATE `pass_code` SET `status`=3, `result`='%s', `operator`='%s' WHERE `search_key`='%s'" % (
                         passvalue1, user_name, search_key)
                     )
-            self.redirect('/admin/manual_passcode')
+            self.redirect('/dama')
             return
 
         total = self.db.get("SELECT count(*) as total FROM `pass_code` WHERE status=1")
@@ -93,21 +96,36 @@ class ManualPasscodeHandler(BaseHandler):
                         total = total['total'],
                         active='manual_passcode', user=user_name, navi=u"")
                 return
-                
-    def post(self):
-        search_key = self.get_argument('file_name', strip=True)
-        image_content = self.get_argument('file_data', strip=True, default=None)
 
-        result = self.db.get("SELECT * FROM `pass_code` WHERE `search_key`='%s'" % search_key)
 
-        if result and result['result']:
-            self.write(result['result'])
+    # def post(self):
+    def _do_query_dama(self, params):
+        root_abspath = os.path.dirname(
+                os.path.abspath(sys.argv[0]))
+
+        config = ConfigObj(root_abspath + '/config/config_online.ini',
+                encoding='UTF8')
+        local_db = database.Connection(**config['mysql'])
+        #search_key = self.get_argument('file_name', strip=True)
+        #image_content = self.get_argument('file_data', strip=True, default=None)
+
+        # 参数解析
+        params = params['params']
+        seller_platform = params['seller_platform']
+        seller = params['seller']
+        content = params['content']
+        search_key = self._md5(content)
+
+        result = local_db.get("SELECT * FROM `pass_code` WHERE `search_key`='%s'" % search_key)
+
+        if result and result['result'] and result['flag'] == 1:
+            logging.debug("====>%s", result)
+            self.parse_result(result['result'])
             return
-        if image_content:
-            file_path = ('%s/passcode_file/%s' % (self.application.settings['static_path'],
-                search_key))
+        if content:
+            file_path = ('%s/static/passcode_file/%s' % (root_abspath, search_key))
             with open(file_path, 'wb') as image_file:
-                image_file.write(base64.b64decode(image_content))
+                image_file.write(base64.b64decode(content))
 
         sql = ("INSERT IGNORE INTO `pass_code` "
             " (`search_key`, `file_path`, `created`) "
@@ -115,7 +133,63 @@ class ManualPasscodeHandler(BaseHandler):
             " ('%s', '%s', NOW()) "
             ) % (search_key, file_path)
         
-        self.db.execute_rowcount(sql)
-        self.write('')
+        affect = local_db.execute_rowcount(sql)
+
+        loop_times = 0
+        hit_numbers = ''
+        flag = True
+        code_position = BaseBusiness._CODE_POSITION
+        while affect:
+            loop_times = loop_times + 1
+            if loop_times > 20:
+                break
+
+            ret = local_db.get(
+                "SELECT * FROM `pass_code` WHERE search_key=%s LIMIT 1", search_key
+            )
+
+            if ret['result']:
+                hit_numbers = ret['result']
+
+                for p in hit_numbers:
+                    if p not in code_position:
+                        # self.write(cjson.encode(self._error_page('10000')))
+                        local_db.execute_rowcount(
+                            "UPDATE `pass_code` SET flag=2 WHERE search_key=%s LIMIT 1", search_key
+                        )
+                        flag = False
+                        break
+                break
+            time.sleep(1)
+        
+        logging.debug("%s,%s", flag, result)
+        if flag:
+            # 成功
+            logging.debug("=SUC===>%s", result)
+            self.parse_result(hit_numbers)
+        else:
+            self.write(cjson.encode(self._error_page('10000')))
+
+        local_db.close()
         return
+    def parse_result(self, hit_numbers):
+        result = []
+        code_position = BaseBusiness._CODE_POSITION
+        for p in hit_numbers:
+            result.append(random.choice(code_position[p]))
+
+        logging.debug("==CODE==>%s", result)
+
+        ret = {
+                'status': 'true',
+                'data': {
+                    'query_id': '100',
+                    'dama_platform': 'manul',
+                    'pass_code': ','.join(result)
+                    }
+                }
+        self.write(cjson.encode(ret))
+        return
+
+
 
