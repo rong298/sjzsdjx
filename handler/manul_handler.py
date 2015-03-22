@@ -15,6 +15,7 @@ class ManulHandler(BaseHandler):
     def get(self):
         user_name = self.get_cookie('user_name')
         if not user_name: # 没有cookie
+            logging.info('[Manul_Input]No username')
             user_name = self.get_argument('user_name', strip=True, default=None)
             if not user_name: # 没有输入用户名
                 self.render("manual_passcode_user.html")
@@ -27,6 +28,7 @@ class ManulHandler(BaseHandler):
         passvalue1 = self.get_argument('passvalue1', strip=True, default=None)
         # passvalue2 = self.get_argument('passvalue2', strip=True, default=None)
         if search_key and passvalue1:
+            logging.info('[Manul_Input]user:%s,key:%s,value:%s',user_name, search_key, passvalue1)
             affected = self.db.execute(
                     "UPDATE `pass_code` SET `status`=3, `result`='%s', `operator`='%s' WHERE `search_key`='%s'" % (
                         passvalue1, user_name, search_key)
@@ -34,12 +36,15 @@ class ManulHandler(BaseHandler):
             self.redirect('/dama')
             return
 
+        logging.info('[Manul_Input]user:%s,Init Search',user_name)
         total = self.db.get("SELECT count(*) as total FROM `pass_code` WHERE status=1")
+
 
         # 优先输入已锁定的验证码
         items = self.db.query("SELECT * FROM `pass_code` WHERE status=2 AND `operator` in ('%s', '') ORDER BY `created` ASC LIMIT 20"
                 % user_name)
         if items:
+            logging.info('[Manul_Input]user:%s,Locked:%s',items)
             self.render("manual_passcode.html", item=items[0],
                     total = total['total'],
                     active='manual_passcode', user=user_name, navi=u"")
@@ -51,6 +56,7 @@ class ManulHandler(BaseHandler):
         logging.debug(items)
 
         if not items:
+            logging.info('[Manul_Input]user:%s,No Image!',items)
             self.render("manual_passcode.html", item={'search_key':''},
                     total = total['total'],
                     active='manual_passcode', user=user_name, navi=u"")
@@ -58,7 +64,7 @@ class ManulHandler(BaseHandler):
         for item in items:
             affected = self.db.execute_rowcount("UPDATE `pass_code` SET status=2, operator='%s' WHERE `id`=%s"
                     % (user_name, item['id']))
-            logging.debug(affected)
+            logging.info('[Manul_Input]user:%s,ID:%s,Locked:%s!',items, item['id'], affected)
             if affected==1:
                 logging.debug(item)
                 self.render("manual_passcode.html", item=item,
