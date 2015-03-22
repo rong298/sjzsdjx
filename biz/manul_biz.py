@@ -76,7 +76,7 @@ class ManulBusiness(BaseBusiness):
         logging.debug('[RESULT][%s] ===> FAIL', image_search_key)
         return dict()
 
-    def query_record(self, params, remote_ip):
+    def query_record(self, params, remote_ip, start_time):
 
         record = {
                 'seller_platform': params['params']['seller_platform'],
@@ -85,8 +85,8 @@ class ManulBusiness(BaseBusiness):
                 'dama_token_key': '',
                 'dama_account': '',
                 'status': 1,
-                'start_time': '0000-00-00 00:00:00',
-                'end_time': '0000-00-00 00:00:00',
+                'start_time': start_time,
+                'end_time': start_time,
                 'server_address': self.get_local_ip('eth1'),
                 'query_address': remote_ip,
                 'result': '',

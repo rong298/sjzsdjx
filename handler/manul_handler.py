@@ -71,10 +71,10 @@ class ManulHandler(BaseHandler):
         manul_biz = ManulBusiness(db=self.db, config=config, app_config=self.application.settings)
 
         # 先记录
-        insert_id = manul_biz.query_record(params,  self.request.remote_ip)
+        start_time = datetime.datetime.now()
+        insert_id = manul_biz.query_record(params,  self.request.remote_ip, start_time)
 
         # 打码解析
-        start_time = datetime.datetime.now()
         result = manul_biz.passcode_identify(params['params']['content'],
                 config['image_type'])
         end_time =  datetime.datetime.now()
