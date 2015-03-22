@@ -31,7 +31,6 @@ from lib import database
 from timer.main_processor_checker import MainProcessorChecker
 from handler.ruokuai_handler import RuokuaiHandler
 from handler.dama2_handler import Dama2Handler
-
 from handler.manul_handler import ManulHandler
 
 define("port", default=9001, help="run on the given port", type=int)

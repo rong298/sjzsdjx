@@ -37,9 +37,11 @@ class BaseBusiness(object):
         self.app_config = kargs.get('app_config', None)
 
     def get_local_ip(self, ifname): 
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
-        inet = fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', ifname[:15])) 
-        ret = socket.inet_ntoa(inet[20:24]) 
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        inet = fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', ifname[:15]))
+        ret = socket.inet_ntoa(inet[20:24])
+
+        #ret = '127.0.0.1'
         return ret
 
     def any_to_str(self, value):            
