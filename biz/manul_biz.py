@@ -85,6 +85,8 @@ class ManulBusiness(BaseBusiness):
                 'dama_token_key': '',
                 'dama_account': '',
                 'status': 1,
+                'start_time': '0000-00-00 00:00:00',
+                'end_time': '0000-00-00 00:00:00',
                 'server_address': self.get_local_ip('eth1'),
                 'query_address': remote_ip,
                 'result': '',
