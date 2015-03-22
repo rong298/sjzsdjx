@@ -44,7 +44,7 @@ class ManulHandler(BaseHandler):
         items = self.db.query("SELECT * FROM `pass_code` WHERE status=2 AND `operator` in ('%s', '') ORDER BY `created` ASC LIMIT 20"
                 % user_name)
         if items:
-            logging.info('[Manul_Input]user:%s,Locked:%s',items)
+            logging.info('[Manul_Input]user:%s,Locked:%s',user_name, items)
             self.render("manual_passcode.html", item=items[0],
                     total = total['total'],
                     active='manual_passcode', user=user_name, navi=u"")
