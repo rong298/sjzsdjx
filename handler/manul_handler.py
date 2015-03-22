@@ -50,6 +50,7 @@ class ManulHandler(BaseHandler):
                     active='manual_passcode', user=user_name, navi=u"")
             return
 
+        logging.info('[Manul_Input]user:%s,No Locked Image!',user_name)
         # 从未锁定的记录中选择
         items = self.db.query("SELECT * FROM `pass_code` WHERE status=1 ORDER BY `created` ASC")
 
