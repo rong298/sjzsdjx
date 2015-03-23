@@ -80,7 +80,7 @@ class ManulBusiness(BaseBusiness):
         return affect
 
     def wait(self, image_search_key):
-        max_loops = self.config['timeout']
+        max_loops = int(self.config['timeout'])
         loop_times = 0
         while True:
             # Loop Part
@@ -97,6 +97,7 @@ class ManulBusiness(BaseBusiness):
             if image and image['result']:
                 return image
 
+        logging.error('[%s][%s][%s] ====> TimeOut <====', image_search_key, max_loops, loop_times)
         return False
 
     def parse_result(self, id, result):
