@@ -24,7 +24,7 @@ import traceback
 import cjson
 import requests
 
-from base_biz import BaseBusiness
+from biz.base_biz import BaseBusiness
 
 class Dama2Business(BaseBusiness):
 

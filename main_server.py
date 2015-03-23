@@ -29,10 +29,11 @@ from tornado.options import options
 
 from lib import database
 from timer.main_processor_checker import MainProcessorChecker
+from handler.auto_handler import AutoHandler
 from handler.ruokuai_handler import RuokuaiHandler
 from handler.dama2_handler import Dama2Handler
 from handler.manul_handler import ManulHandler
-from hanlder.auto_handler import AutoHandler
+from handler.manul_input_handler import *
 
 define("port", default=9001, help="run on the given port", type=int)
 define("proc", default=2, help="the number of system processes", type=int)
@@ -45,16 +46,16 @@ STATIC_PATH = ABS_ROOT_PATH + "/static"
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = []
-        if options.platform == 'manul':
-            handlers.append((r"/dama[/]?", ManulHandler))
-        elif options.platform == 'ruokuai':
-            handlers.append((r"/dama[/]?", RuokuaiHandler))
-        elif options.platform == 'dama2':
-            handlers.append((r"/dama[/]?", Dama2Handler))
-        elif options.platform == 'ruokuai':
-            handlers.append((r"/dama[/]?", RuokuaiHandler))
-        elif options.platform == 'auto':
-            handlers.append((r"/dama[/]?", AutoHandler))
+
+        # 打码查询接口路由
+        handlers.append((r"/dama[/]?", AutoHandler))
+
+        # 手工打码输入界面路由
+        handlers.append((r"/manul_dama/login[/]?", ManulLoginHandler))
+        handlers.append((r"/manul_dama/login_process[/]?", ManulLoginProcessHandler))
+        handlers.append((r"/manul_dama/search[/]?", ManulSearchHandler))
+        handlers.append((r"/manul_dama/input[/]?", ManulInputHandler))
+
 
         root_abspath = os.path.dirname(
                 os.path.abspath(sys.argv[0]))

@@ -8,6 +8,7 @@ Create on 2014-08-12
 '''
 
 import os
+import uuid
 
 import sys
 
@@ -122,3 +123,8 @@ class BaseHandler(tornado.web.RequestHandler):
         myMd5_Digest = myMd5.hexdigest()
         return myMd5_Digest
 
+    def check_login(self):
+        user_name = self.get_cookie('user_name')
+        if not user_name:
+            return False
+        return user_name

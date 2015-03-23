@@ -17,6 +17,14 @@ class Redis(object):
         redis_handler = redis.Redis(**config['redis'])
 
         expire = timeout
-        self.redis.set(key, value)
-        self.redis.expire(key, expire)
+        redis_handler.set(key, value)
+        redis_handler.expire(key, expire)
+
+    @staticmethod
+    def get(self, key):
+        config = ConfigObj(ABS_ROOT_PATH+ '/config/config_online.ini', encoding='UTF8')
+
+
+        redis_handler = redis.Redis(**config['redis'])
+        return redis_handler.get(key)
 

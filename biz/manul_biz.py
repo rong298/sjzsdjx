@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 __author__ = 'Jacky'
 
-from base_biz import BaseBusiness
+from biz.base_biz import BaseBusiness
 import base64
 import time
 import cjson

@@ -11,6 +11,7 @@ from biz.ruokuai_biz import RuokuaiBusiness
 
 from lib.redis_lib import Redis
 from lib.md5_lib import MD5
+import base64
 
 import datetime
 
@@ -34,15 +35,17 @@ class AutoHandler(BaseHandler):
 
         # 缓存图片到Redis
         search_key = MD5.create(image)
-        Redis.set(search_key, image)
+        Redis.set(search_key, base64.b64encode(image))
 
+        # 启动Biz
+        config = self._load_config('/config/%s.ini' % Dama2Business._PLATFORM_CODE)
         process_biz = None
         if dama_platform == BaseBusiness.MANUL:
-            process_biz = ManulBusiness()
+            process_biz = ManulBusiness(db=self.db, config=config)
         elif dama_platform == BaseBusiness.DAMA2:
-            process_biz = Dama2Business()
+            process_biz = Dama2Business(db=self.db, config=config)
         elif dama_platform == BaseBusiness.RUOKUAI:
-            process_biz = RuokuaiBusiness()
+            process_biz = RuokuaiBusiness(db=self.db, config=config)
         else:
             self._fail_out(10002)
             return

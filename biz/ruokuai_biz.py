@@ -25,7 +25,7 @@ import cjson
 from configobj import ConfigObj
 
 from lib.api.ruokuai import RClient
-from base_biz import BaseBusiness
+from biz.base_biz import BaseBusiness
 import base64
 
 class RuokuaiBusiness(BaseBusiness):
