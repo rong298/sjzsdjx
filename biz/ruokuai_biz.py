@@ -17,12 +17,8 @@
 
 import random
 import logging
-import datetime
 import traceback
 import re
-
-import cjson
-from configobj import ConfigObj
 
 from lib.api.ruokuai import RClient
 from biz.base_biz import BaseBusiness
@@ -35,23 +31,30 @@ class RuokuaiBusiness(BaseBusiness):
 
     def passcode_identify(self, record_id, image_content, redis_key=''):
         config = self.config
+        logging.debug('[ruokuai]account:%s', config)
 
-        image_buffer = base64.b16encode(image_content)
-        rc = RClient(
-            config['account'],
-            config['password'],
-            config['code'],
-            config['token']
-        )
         try:
+            image_buffer = base64.b64decode(image_content)
+        except:
+            image_buffer = image_content
+
+        try:
+            rc = RClient(
+                config['account'],
+                config['password'],
+                config['code'],
+                config['token']
+            )
             response = rc.rk_create(image_buffer, config['image_type'])
             logging.info('Result:%s', response)
         except:
             logging.error(traceback.format_exc())
             self.error_record(record_id, 2)
 
-        result = self.parse_result(record_id, response)
+        logging.debug('[ruokuai][%s]Result:%s', record_id, response)
+        result = self.parse_result(response)
         if not result:
+            logging.debug('[ruokuai][%s]ResultParseFail:%s', record_id, result)
             self.error_record(record_id, 3, 1)
             return False
 
@@ -65,10 +68,10 @@ class RuokuaiBusiness(BaseBusiness):
         if res.has_key('Error_Code'):
             return False
 
-        if not res.has_key('result'):
+        if not res.has_key('Result'):
             return False
 
-        code = str(res['result'])
+        code = str(res['Result'])
 
         # 正则判断返回的数据是否符合格式要求
         pattern = re.compile(r'^[1-8]{1,8}$')

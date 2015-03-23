@@ -31,8 +31,8 @@ class ManulBusiness(BaseBusiness):
         result = self.create_new_image(image_search_key)
         if not result:
             logging.info('[%s][%s]CreateFail:%s', self._PLATFORM_CODE, image_search_key, result)
-            self.error_record(record_id, 2)
-            return False
+            # self.error_record(record_id, 2)
+            # return False
 
         # 同步等待
         result = self.wait(image_search_key)
@@ -42,7 +42,12 @@ class ManulBusiness(BaseBusiness):
             return False
 
         result = self.parse_result(record_id, result)
+        if not result:
+            logging.debug('[%s][%s]ResultParseFail:%s', self._PLATFORM_CODE, record_id, result)
+            self.error_record(record_id, 3, 1)
+            return False
 
+        return result
 
     def check_old_image(self, image_search_key):
         # 判断数据库中是否处理过该图片
@@ -81,16 +86,16 @@ class ManulBusiness(BaseBusiness):
             # Loop Part
             loop_times = loop_times + 1
             time.sleep(1)
+            if loop_times > max_loops:
+                break
 
             image = self.db.get(
                 "SELECT * FROM `pass_code` WHERE search_key=%s AND status=3", image_search_key
             )
-            logging.debug('[LOOP][%s][%s] ===> %s', image_search_key, loop_times, image['result'])
+            logging.debug('[LOOP][%s][%s][%s] ===> %s', image_search_key, max_loops, loop_times, image)
 
             if image and image['result']:
                 return image
-            if loop_times > max_loops:
-                break
 
         return False
 

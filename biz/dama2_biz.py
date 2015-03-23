@@ -39,15 +39,16 @@ class Dama2Business(BaseBusiness):
         # 发送请求
         try:
             response = requests.post(config['adepter_url'], data=query_params)
-            logging.info('[%s]Result:%s', self._PLATFORM_CODE, response.text)
         except:
             logging.error(traceback.format_exc())
             self.error_record(record_id, 2, 1)
             return False
 
+        logging.debug('[dama2][%s]Result:%s', record_id, response)
         # 解析结果
         result = self.parse_result(response.text)
         if not result:
+            logging.debug('[ruokuai][%s]ResultParseFail:%s', record_id, result)
             # 解析失败
             self.error_record(record_id, 3, 1)
             return False
@@ -64,13 +65,13 @@ class Dama2Business(BaseBusiness):
     def parse_result(self, response):
         res = cjson.decode(response)
 
-        if not res.has_key('ret') or res['ret'] != 0:
+        if not res.has_key('ret') or res['ret'] != "0":
             # 接口调用失败
             return False
 
         ret = {
             'dama_token': res['id'],
-            'position': res['result'],
+            'position': res['result'].replace('|', ","),
             'origin_result': res['result'],
             'status': 1
         }

@@ -7,7 +7,7 @@ import hashlib
 class MD5(object):
 
     @staticmethod
-    def create(self, src):
+    def create(src):
         myMd5 = hashlib.md5()
         myMd5.update(src)
         myMd5_Digest = myMd5.hexdigest()

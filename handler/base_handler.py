@@ -14,6 +14,7 @@ import sys
 
 import logging
 import traceback
+import base64
 
 import cjson
 import tornado.web
@@ -29,6 +30,10 @@ class BaseHandler(tornado.web.RequestHandler):
     @property
     def proxies(self):
         return self.application.proxies
+
+    @property
+    def redis(self):
+        return self.application.redis
 
     def get(self):
         self._do_get()
@@ -125,6 +130,20 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def check_login(self):
         user_name = self.get_cookie('user_name')
+        logging.debug('[%s]check login ...', user_name)
         if not user_name:
             return False
         return user_name
+
+    def redis_set(self, key, value, timeout=120):
+        pass
+
+    def redis_get(self, key):
+        image_content = self.redis.get(key)
+
+        try:
+            image = base64.b64decode(image_content)
+        except:
+            image = image_content
+
+        return image

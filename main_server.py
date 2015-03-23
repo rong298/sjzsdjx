@@ -18,6 +18,7 @@
 import os
 import sys
 import logging
+import redis
 
 from configobj import ConfigObj
 
@@ -86,6 +87,8 @@ class Application(tornado.web.Application):
             host=config['mysql']['host'], database=config['mysql']['database'],
             user=config['mysql']['user'], password=config['mysql']['password'])
         '''
+
+        self.redis = redis.Redis(**config['redis'])
 
         self.proxies = {}
         if options.proxies:

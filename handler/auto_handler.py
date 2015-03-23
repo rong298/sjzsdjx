@@ -9,11 +9,10 @@ from biz.manul_biz import ManulBusiness
 from biz.ruokuai_biz import RuokuaiBusiness
 
 
-from lib.redis_lib import Redis
 from lib.md5_lib import MD5
 import base64
-
 import datetime
+import logging
 
 
 class AutoHandler(BaseHandler):
@@ -35,10 +34,12 @@ class AutoHandler(BaseHandler):
 
         # 缓存图片到Redis
         search_key = MD5.create(image)
-        Redis.set(search_key, base64.b64encode(image))
+        self.redis.set(search_key, base64.b64encode(image))
+        self.redis.expire(search_key, 60*10)
+
+        config = self._load_config('/config/%s.ini' % dama_platform)
 
         # 启动Biz
-        config = self._load_config('/config/%s.ini' % Dama2Business._PLATFORM_CODE)
         process_biz = None
         if dama_platform == BaseBusiness.MANUL:
             process_biz = ManulBusiness(db=self.db, config=config)
@@ -47,14 +48,15 @@ class AutoHandler(BaseHandler):
         elif dama_platform == BaseBusiness.RUOKUAI:
             process_biz = RuokuaiBusiness(db=self.db, config=config)
         else:
-            self._fail_out(10002)
-            return
+            config = self._load_config('/config/%s.ini' % BaseBusiness.RUOKUAI)
+            process_biz = RuokuaiBusiness(db=self.db, config=config)
 
 
         # 记录pass_code_records
         start_time = datetime.datetime.now()
         record_id = process_biz.query_record(dama_platform, seller_platform, seller, self.request.remote_ip, start_time)
         if not record_id:
+            logging.error('[%s][%s]RecordFail...',dama_platform, record_id)
             self._fail_out(10002)
             return
 
@@ -64,10 +66,13 @@ class AutoHandler(BaseHandler):
         #
         result = process_biz.passcode_identify(record_id=record_id, image_content=image, redis_key=search_key)
         if not result:
+            logging.error('[%s][%s]Result:%s',dama_platform, record_id, result)
             self._fail_out(10000)
             return
 
         end_time = datetime.datetime.now()
+
+        logging.info('[%s][%s]Result:%s',dama_platform, record_id, result)
         # 记录pass_code_records
         process_biz.response_record(record_id, result['dama_token'], end_time, result['origin_result'], result['status'])
 
