@@ -19,6 +19,7 @@ import random
 import logging
 import datetime
 import traceback
+import re
 
 import cjson
 from configobj import ConfigObj
@@ -31,88 +32,65 @@ class RuokuaiBusiness(BaseBusiness):
 
     _PLATFORM_CODE = 'ruokuai'
 
-    def passcode_identify(self, image_content, image_type=6113):
+
+    def passcode_identify(self, record_id, image_content, redis_key=''):
         config = self.config
 
-        buffer = base64.b64decode(image_content)
-        logging.info("ACCOUNT:%s-%s-%s-%s" % (config['account'],config['code'],str(image_type),config['token']))
-        rc = RClient(config['account'], config['password'], config['code'],
-                config['token'])
-        result = rc.rk_create(buffer, image_type) # 3040 6113 
-        logging.info('Result: %s' % result)
+        image_buffer = base64.b16encode(image_content)
+        rc = RClient(
+            config['account'],
+            config['password'],
+            config['code'],
+            config['token']
+        )
+        try:
+            response = rc.rk_create(image_buffer, config['image_type'])
+            logging.info('Result:%s', response)
+        except:
+            logging.error(traceback.format_exc())
+            self.error_record(record_id, 2)
+
+        result = self.parse_result(record_id, response)
+        if not result:
+            self.error_record(record_id, 3, 1)
+            return False
+
         return result
 
-    def insert_record(self, params, result, start_time, end_time, remote_ip):
-        record = {
-                'seller_platform': params['params']['seller_platform'],
-                'seller': params['params']['seller'],
-                'dama_platform': self._PLATFORM_CODE,
-                'dama_token_key': '' if 'Id' not in result else result['Id'],
-                'dama_account': '',
-                'status': 1,
-                'server_address': self.get_local_ip('eth1'),
-                'query_address': remote_ip,
-                'start_time': str(start_time),
-                'end_time': str(end_time),
-                'result': cjson.encode(result),
-                'created': str(datetime.datetime.now())
-                }
 
-        sql = ("INSERT INTO `pass_code_records`"
-                " (`%s`) "
-                " VALUES "
-                " ('%s') "
-                ) % (
-                        "`, `".join(map(self.any_to_str, record.keys())),
-                        "', '".join(map(self.any_to_str, record.values()))
-                        )
-        id = self.db.execute_lastrowid(sql)
-        return id
+    def parse_params(self):
+        pass
 
-    def parse_result(self, id, result):
-        if 'Error_Code' in result:
-            self.report_error(id, '3')
+    def parse_result(self, res):
+        if res.has_key('Error_Code'):
             return False
-            
-        code = result['Result']
-        logging.debug(code)
-        if (code.isdigit() and len(code)<8 and
-                '9' not in code and '0' not in code):
 
-            result = []
-            for p in str(code):
-                result.append(random.choice(self._CODE_POSITION[p]))
+        if not res.has_key('result'):
+            return False
 
-            # 返回适配好的打码结果
-            return {
-                    'status': 'true',
-                    'data': {
-                        'query_id': str(id),    #数据库自增ID
-                        'dama_platform': RuokuaiBusiness._PLATFORM_CODE, #打码平台标示
-                        'pass_code': ','.join(result),    #验证码坐标    
-                        }
-                    }
+        code = str(res['result'])
 
-        self.report_error(id, '4')
-        return False
-    
-    def report_error(self, id, status='5'):
-        ''' 记录打码错误
-        状态枚举
-        1 正常
-        2 500
-        3 平台返回失败
-        4 内部判断胡填
-        5 前端汇报失败
-        '''
-        sql = (" UPDATE `pass_code_records` "
-            " SET `status`=%s, `notice_status`=%s WHERE `id`=%s "
-            ) % (str(status),
-                '1' if status in [4, 5, '4', '5'] else '0',
-                id)
-        affected = self.db.execute_rowcount(sql)
-        logging.warn('[%s] Report Error id:%s row[%s]' % ( self._PLATFORM_CODE,
-            id, affected))
-        return affected
+        # 正则判断返回的数据是否符合格式要求
+        pattern = re.compile(r'^[1-8]{1,8}$')
+        match = pattern.match(code)
+        if not match:
+            return False
 
-   
+        # 获取坐标
+        result = []
+        for p in code:
+            position = random.choice(self._CODE_POSITION[p])
+            result.append(position)
+        result = ','.join(result)
+
+        # 格式化返回
+
+        ret = {
+            'dama_token': res['Id'],
+            'position': result,
+            'origin_result': code,
+            'status': 1
+        }
+
+        return ret
+

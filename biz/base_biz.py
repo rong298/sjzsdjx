@@ -19,6 +19,7 @@ import logging
 import traceback
 
 import cjson
+import datetime
 
 class BaseBusiness(object):
 
@@ -29,7 +30,11 @@ class BaseBusiness(object):
             '5': ['41,114','41,112','38,110','44,113'], 
             '6': ['112,124','126,110','117,118','110,123'], 
             '7': ['186,119','171,115','192,118','191,118'], 
-            '8': ['257,109','253,116','242,107','265,122']} 
+            '8': ['257,109','253,116','242,107','265,122']}
+
+    MANUL = 'manul'
+    DAMA2 = 'dama2'
+    RUOKUAI = 'ruokuai'
 
     def __init__(self, **kargs):
         self.db = kargs.get('db', None)
@@ -54,4 +59,56 @@ class BaseBusiness(object):
         myMd5.update(src)
         myMd5_Digest = myMd5.hexdigest()
         return myMd5_Digest
+
+    def query_record(self, platform, seller_platform, seller, remote_ip, start_time):
+
+        record = {
+                'seller_platform': seller_platform,
+                'seller': seller,
+                'dama_platform': platform,
+                'dama_token_key': '',
+                'dama_account': '',
+                'status': 0,
+                'start_time': start_time,
+                'end_time': start_time,
+                'server_address': self.get_local_ip('eth1'),
+                'query_address': remote_ip,
+                'result': '',
+                'created': str(datetime.datetime.now())
+                }
+
+        sql = ("INSERT INTO `pass_code_records`"
+                " (`%s`) "
+                " VALUES "
+                " ('%s') "
+                ) % (
+                        "`, `".join(map(self.any_to_str, record.keys())),
+                        "', '".join(map(self.any_to_str, record.values()))
+                        )
+        id = self.db.execute_lastrowid(sql)
+        return id
+
+    def response_record(self, id, dama_token_key, end_time, result, status=1):
+
+        affect = self.db.execute_rowcount(
+            "UPDATE `pass_code_records` SET dama_token_key=%s,end_time=%s,result=%s,status=%s WHERE id=%s",
+            dama_token_key,
+            end_time,
+            result,
+            status,
+            id
+        )
+
+        return affect
+
+    def error_record(self, id, status, notice_status=0):
+        affect = self.db.execute_rowcount(
+            "UPDATE `pass_code_records` SET status=%s,notice_status=%s,end_time=%s WHERE id=%s",
+            status,
+            notice_status,
+            str(datetime.datetime.now()),
+            id
+        )
+
+        return affect
 

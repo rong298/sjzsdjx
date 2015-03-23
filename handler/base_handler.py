@@ -82,6 +82,7 @@ class BaseHandler(tornado.web.RequestHandler):
             '10000': u'打码错误',
             '10001': u'params获取失败',
             '10002': u'服务器异常',
+            '10003': u'配置错误',
             }
 
     def _error_page(self, code, message=''):
@@ -99,6 +100,16 @@ class BaseHandler(tornado.web.RequestHandler):
         else:
             result['error']['message'] = '未知的错误码'
         return result
+
+    def _fail_out(self, code):
+        self.write(cjson.encode(self._error_page(str(code))))
+
+    def _succ_out(self, content):
+        result = {
+            "status": "true",
+            "data": content
+        }
+        self.write(cjson.encode(result))
 
     def _load_config(self, file_name):
         config = ConfigObj( 
