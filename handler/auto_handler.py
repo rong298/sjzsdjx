@@ -86,7 +86,7 @@ class AutoHandler(BaseHandler):
             'pass_code': result['position']
             })
 
-    def distribute(self, seller_platform, seller, scene):
+    def distribute(self, seller_platform, seller, scene=''):
         dist = self.db.get(
             "SELECT * FROM `pass_code_config` WHERE seller_platform=%s AND seller=%s AND scene=%s",
             seller_platform, seller, scene
