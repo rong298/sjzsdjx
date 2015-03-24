@@ -17,9 +17,12 @@ class ManulBusiness(BaseBusiness):
 
     _PLATFORM_CODE = 'manul'
 
-    def passcode_identify(self, record_id,  image_content='', redis_key=''):
+    def passcode_identify(self, record_id,  image_content, params={}, redis_key=''):
         # 图片标的
         image_search_key = redis_key
+
+        self.order_id = params.get('order_id', '')
+        self.scene = params.get('scene', '')
 
         # 校验旧文件
         result = self.check_old_image(image_search_key)
@@ -72,10 +75,12 @@ class ManulBusiness(BaseBusiness):
     def create_new_image(self, image_search_key):
         # 创造新文件, 这里是一个兼容，之前file_path是本地文件地址，现在时redis存得key
         affect = self.db.execute_lastrowid(
-            "INSERT IGNORE INTO `pass_code` (`search_key`, `file_path`, `created`) VALUES (%s, %s, %s)",
+            "INSERT IGNORE INTO `pass_code` (`search_key`, `file_path`, `created`, `order_id`, `scene`) VALUES (%s, %s, %s)",
             image_search_key,
             image_search_key,
-            str(datetime.datetime.now())
+            str(datetime.datetime.now()),
+            self.order_id,
+            self.scene
         )
         return affect
 

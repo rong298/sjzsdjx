@@ -30,7 +30,7 @@ class Dama2Business(BaseBusiness):
 
     _PLATFORM_CODE = 'dama2'
 
-    def passcode_identify(self, record_id, image_content, redis_key=''):
+    def passcode_identify(self, record_id, image_content, params=None, redis_key=''):
         config = self.config
 
         # 获取参数

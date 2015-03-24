@@ -62,7 +62,7 @@ class BaseBusiness(object):
         myMd5_Digest = myMd5.hexdigest()
         return myMd5_Digest
 
-    def query_record(self, platform, seller_platform, seller, remote_ip, start_time):
+    def query_record(self, platform, seller_platform, seller, remote_ip, start_time, order_id, scene):
 
         record = {
                 'seller_platform': seller_platform,
@@ -71,6 +71,8 @@ class BaseBusiness(object):
                 'dama_token_key': '',
                 'dama_account': '',
                 'status': 0,
+                'order_id': order_id,
+                'scene': scene,
                 'start_time': start_time,
                 'end_time': start_time,
                 'server_address': self.get_local_ip('eth1'),

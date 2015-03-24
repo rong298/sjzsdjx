@@ -29,8 +29,7 @@ class YunDamaBusiness(BaseBusiness):
 
     _PLATFORM_CODE = 'yundama'
 
-
-    def passcode_identify(self, record_id, image_content, redis_key=''):
+    def passcode_identify(self, record_id, image_content, params=None, redis_key=''):
         config = self.config
         logging.debug('[%s]account:%s', self._PLATFORM_CODE, config)
 

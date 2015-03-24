@@ -130,7 +130,8 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def check_login(self):
         user_name = self.get_cookie('user_name')
-        logging.debug('[%s]check login ...', user_name)
+        work_code = self.get_cookie('token')
+        logging.debug('[%s][%s]check login ...', user_name, work_code)
         if not user_name:
             return False
         return user_name

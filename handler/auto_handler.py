@@ -23,13 +23,16 @@ class AutoHandler(BaseHandler):
         # 参数校验
         params = params['params']
         seller_platform = params['seller_platform']
-        seller = params['seller']
-        scene = params['scene']
+        seller_platform = params.get('seller_platform', 'default')
+        seller = params.get('seller', 'default')
+        scene = params.get('scene', 'default')
+        order_id = params.get('order_id', '')
         image = params['content']
 
         # 从数据库中获取分发规则
         dama_platform = self.distribute(seller_platform, seller, scene)
         if not dama_platform:
+            logging.error('[%s,%s,%s] Distribute Fail')
             self._fail_out(10003)
             return
 
@@ -57,7 +60,7 @@ class AutoHandler(BaseHandler):
 
         # 记录pass_code_records
         start_time = datetime.datetime.now()
-        record_id = process_biz.query_record(dama_platform, seller_platform, seller, self.request.remote_ip, start_time)
+        record_id = process_biz.query_record(dama_platform, seller_platform, seller, self.request.remote_ip, start_time, order_id, scene)
         if not record_id:
             logging.error('[%s][%s]RecordFail...',dama_platform, record_id)
             self._fail_out(10002)
@@ -67,7 +70,7 @@ class AutoHandler(BaseHandler):
         #
         # {'dama_token':'', 'position':'', 'origin_result':'', 'status':1}
         #
-        result = process_biz.passcode_identify(record_id=record_id, image_content=image, redis_key=search_key)
+        result = process_biz.passcode_identify(record_id=record_id, image_content=image, params=params, redis_key=search_key)
         if not result:
             logging.error('[%s][%s]Result:%s',dama_platform, record_id, result)
             self._fail_out(10000)
@@ -88,7 +91,7 @@ class AutoHandler(BaseHandler):
 
     def distribute(self, seller_platform, seller, scene=''):
         dist = self.db.get(
-            "SELECT * FROM `pass_code_config` WHERE seller_platform=%s AND seller=%s AND scene=%s",
+            "SELECT * FROM `pass_code_config` WHERE seller_platform=%s AND seller=%s AND scene=%s LIMIT 1",
             seller_platform, seller, scene
         )
         if not dist:

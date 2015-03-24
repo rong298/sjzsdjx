@@ -29,7 +29,7 @@ class RuokuaiBusiness(BaseBusiness):
     _PLATFORM_CODE = 'ruokuai'
 
 
-    def passcode_identify(self, record_id, image_content, redis_key=''):
+    def passcode_identify(self, record_id, image_content, params=None, redis_key=''):
         config = self.config
         logging.debug('[ruokuai]account:%s', config)
 
