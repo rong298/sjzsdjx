@@ -42,13 +42,14 @@ class BaseBusiness(object):
         self.db = kargs.get('db', None)
         self.config = kargs.get('config', None)
         self.app_config = kargs.get('app_config', None)
+        self.dis_code = kargs.get('dis_code', None)
 
     def get_local_ip(self, ifname): 
-        #s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        #inet = fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', ifname[:15]))
-        #ret = socket.inet_ntoa(inet[20:24])
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        inet = fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', ifname[:15]))
+        ret = socket.inet_ntoa(inet[20:24])
 
-        ret = '127.0.0.1'
+        #ret = '127.0.0.1'
         return ret
 
     def any_to_str(self, value):            
@@ -72,6 +73,7 @@ class BaseBusiness(object):
                 'dama_account': '',
                 'status': 0,
                 'order_id': order_id,
+                'dis_code': self.dis_code,
                 'scene': scene,
                 'start_time': start_time,
                 'end_time': start_time,

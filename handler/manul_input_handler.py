@@ -16,14 +16,26 @@ from base_handler import BaseHandler
 
 class ManulLoginHandler(BaseHandler):
     def get(self):
-        self.render('manul_input_login.html')
+        msg = self.get_argument('msg', None)
+        self.render('manul_input_login.html', msg=msg)
         return
 
 class ManulLoginProcessHandler(BaseHandler):
     def get(self):
         # 不是登录状态
         user_name = self.get_argument('user_name', strip=True, default=None)
-        work_code = self.get_argument('token', strip=True, default=None)
+        work_code = self.get_argument('token', strip=True, default='')
+
+        logging.debug('[LoginProcess]%s,%s', user_name, work_code)
+        if work_code.lower() != 'all':
+            try:
+                base64.b64decode(work_code)
+            except:
+                self.redirect('/manul_dama/login?msg=token错误')
+                return
+        else:
+            work_code = base64.b64encode('all')
+
         if not user_name:
             self.redirect('/manul_dama/login')
         else:
@@ -42,6 +54,9 @@ class ManulSearchHandler(BaseHandler):
 
         # 设置过滤器
         filter = self.filter_config()
+        if not filter:
+            self.redirect('/manul_dama/login?msg=登陆信息有误')
+            return
         self.filter = filter
 
         # 计算总计
@@ -56,18 +71,18 @@ class ManulSearchHandler(BaseHandler):
         if not item:
             item = self.search_in_all(user_name)
 
-        self.parse_render(item, total, filter)
+        self.parse_render(item, total)
         return
 
 
     def parse_render(self, item, total):
         user_name = self.get_cookie('user_name')
-        redis_key = item.get('file_path', None)
 
-        if redis_key:
-            image_content = self.redis_get(redis_key)
-        else:
-            image_content = None
+        image_content = None
+        if isinstance(item, dict):
+            redis_key = item.get('file_path', None)
+            if redis_key:
+                image_content = self.redis_get(redis_key)
 
         self.render('manul_search.html',
                         item=item,
@@ -78,22 +93,25 @@ class ManulSearchHandler(BaseHandler):
                         navi=u"")
 
     def filter_config(self):
+        tokens = self.db.query("SELECT `token` FROM `pass_code_config`")
+        tt = []
+        for t in tokens:
+            tt.append(t['token'])
+        if len(tt) == 0:
+            return False
+
         codes = self.get_cookie('token')
 
-        # 如果没有，就默认全部
-        if not codes:
-            return False
-        codes = base64.decode(codes)
-        code_list = codes.split('-')
+        if codes:
+            try:
+                codes = base64.b64decode(codes)
+            except:
+                return False
+            if codes.lower() != 'all':
+                tt = codes.split(",")
 
-        rules = self.db.query("SELECT * FROM `pass_code_config`")
+        return tt
 
-        ret = []
-        for rule in rules:
-            if not rule['token'] in code_list:
-                continue
-            ret.append(rule)
-        return ret
 
     def do_filter(self, filter, items):
         if not filter:
@@ -101,29 +119,27 @@ class ManulSearchHandler(BaseHandler):
 
         new_items = []
         for it in items:
-                for ru in filter:
-                    if it['seller_platform'] == ru['seller_platform'] and it['seller'] == ru['seller'] and it['scene'] == ru['scene']:
-                        new_items.append(it)
-                        break
+            if it['dis_code'] in filter:
+                new_items.append(it)
 
         return new_items
 
 
     def total(self, filter):
         user_name = self.get_cookie('user_name')
-        items = self.db.get("SELECT * FROM `pass_code` WHERE status=1")
+        items = self.db.query("SELECT * FROM `pass_code` WHERE status=1")
         if not filter:
             total = len(items)
         else:
             num = 0
             for it in items:
-                for ru in filter:
-                    if it['seller_platform'] == ru['seller_platform'] and it['seller'] == ru['seller'] and it['scene'] == ru['scene']:
-                        num = num + 1
-                        break
+                if it['dis_code'] in filter:
+                    num = num + 1
 
             total = num
         logging.debug('[%s]Searching...%s', user_name, total)
+
+        return total
 
 
     def search_in_checked(self, user_name):
@@ -133,6 +149,8 @@ class ManulSearchHandler(BaseHandler):
         )
 
         items = self.do_filter(self.filter, items)
+        if not items:
+            return False
 
         return items[0]
 

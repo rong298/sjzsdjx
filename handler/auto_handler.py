@@ -32,7 +32,6 @@ class AutoHandler(BaseHandler):
         # 从数据库中获取分发规则
         dama_platform = self.distribute(seller_platform, seller, scene)
         if not dama_platform:
-            logging.error('[%s,%s,%s] Distribute Fail')
             self._fail_out(10003)
             return
 
@@ -46,16 +45,16 @@ class AutoHandler(BaseHandler):
         # 启动Biz
         process_biz = None
         if dama_platform == BaseBusiness.MANUL:
-            process_biz = ManulBusiness(db=self.db, config=config)
+            process_biz = ManulBusiness(db=self.db, config=config, dis_code=self.distribute_code)
         elif dama_platform == BaseBusiness.DAMA2:
-            process_biz = Dama2Business(db=self.db, config=config)
+            process_biz = Dama2Business(db=self.db, config=config, dis_code=self.distribute_code)
         elif dama_platform == BaseBusiness.RUOKUAI:
-            process_biz = RuokuaiBusiness(db=self.db, config=config)
+            process_biz = RuokuaiBusiness(db=self.db, config=config, dis_code=self.distribute_code)
         elif dama_platform == BaseBusiness.YUNDAMA:
-            process_biz = YunDamaBusiness(db=self.db, config=config)
+            process_biz = YunDamaBusiness(db=self.db, config=config, dis_code=self.distribute_code)
         else:
             config = self._load_config('/config/%s.ini' % BaseBusiness.RUOKUAI)
-            process_biz = RuokuaiBusiness(db=self.db, config=config)
+            process_biz = RuokuaiBusiness(db=self.db, config=config, dis_code=self.distribute_code)
 
 
         # 记录pass_code_records
@@ -78,7 +77,7 @@ class AutoHandler(BaseHandler):
 
         end_time = datetime.datetime.now()
 
-        logging.info('[%s][%s]Result:%s',dama_platform, record_id, result)
+        logging.info('[%s][%s]Result:%s,Spend:%s.',dama_platform, record_id, result, end_time-start_time)
         # 记录pass_code_records
         process_biz.response_record(record_id, result['dama_token'], end_time, result['origin_result'], result['status'])
 
@@ -90,14 +89,17 @@ class AutoHandler(BaseHandler):
             })
 
     def distribute(self, seller_platform, seller, scene=''):
+        logging.debug('[%s,%s,%s] Distribute Start', seller_platform, seller, scene)
         dist = self.db.get(
             "SELECT * FROM `pass_code_config` WHERE seller_platform=%s AND seller=%s AND scene=%s LIMIT 1",
             seller_platform, seller, scene
         )
+        logging.debug('[%s,%s,%s] Distribute ===> %s', seller_platform, seller, scene, dist)
         if not dist:
             return False
 
         dama_platform = dist['dama_platform']
+        self.distribute_code = dist['token']
         return dama_platform
 
 

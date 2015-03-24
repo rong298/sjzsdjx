@@ -21,8 +21,12 @@ class ManulBusiness(BaseBusiness):
         # 图片标的
         image_search_key = redis_key
 
+        # logging.debug('[%s][%s]Enter ...', image_search_key, params)
+
         self.order_id = params.get('order_id', '')
         self.scene = params.get('scene', '')
+        self.seller = params.get('seller')
+        self.seller_platform= params.get('seller_platform')
 
         # 校验旧文件
         result = self.check_old_image(image_search_key)
@@ -75,12 +79,16 @@ class ManulBusiness(BaseBusiness):
     def create_new_image(self, image_search_key):
         # 创造新文件, 这里是一个兼容，之前file_path是本地文件地址，现在时redis存得key
         affect = self.db.execute_lastrowid(
-            "INSERT IGNORE INTO `pass_code` (`search_key`, `file_path`, `created`, `order_id`, `scene`) VALUES (%s, %s, %s)",
+            "INSERT IGNORE INTO `pass_code` (`search_key`, `file_path`, `created`, `order_id`, `scene`, `seller`, `seller_platform`, `dis_code`)"
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
             image_search_key,
             image_search_key,
             str(datetime.datetime.now()),
             self.order_id,
-            self.scene
+            self.scene,
+            self.seller,
+            self.seller_platform,
+            self.dis_code
         )
         return affect
 
@@ -97,10 +105,15 @@ class ManulBusiness(BaseBusiness):
             image = self.db.get(
                 "SELECT * FROM `pass_code` WHERE search_key=%s AND status=3", image_search_key
             )
-            logging.debug('[LOOP][%s][%s][%s] ===> %s', image_search_key, max_loops, loop_times, image)
+            # logging.debug('[LOOP][%s][%s][%s] ===> %s', image_search_key, max_loops, loop_times, image)
 
             if image and image['result']:
                 return image
+
+        # 没有来得及打得码进行标记
+        affect = self.db.execute_rowcount(
+            "UPDATE `pass_code` SET status=4,flag=2 WHERE search_key=%s AND status=1", image_search_key
+        )
 
         logging.error('[%s][%s][%s] ====> TimeOut <====', image_search_key, max_loops, loop_times)
         return False

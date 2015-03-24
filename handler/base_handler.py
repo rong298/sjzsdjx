@@ -35,6 +35,10 @@ class BaseHandler(tornado.web.RequestHandler):
     def redis(self):
         return self.application.redis
 
+    @property
+    def query_id(self):
+        return self.application.query_id
+
     def get(self):
         self._do_get()
 

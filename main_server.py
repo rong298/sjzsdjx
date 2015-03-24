@@ -30,6 +30,7 @@ import tornado.ioloop
 import tornado.httpserver
 from tornado.options import define
 from tornado.options import options
+from lib.md5_lib import MD5
 
 from lib import database
 from timer.main_processor_checker import MainProcessorChecker
@@ -92,6 +93,7 @@ class Application(tornado.web.Application):
         '''
 
         self.redis = redis.Redis(**config['redis'])
+        self.query_id = MD5.random_md5()
 
         self.proxies = {}
         if options.proxies:
