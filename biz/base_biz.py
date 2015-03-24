@@ -20,6 +20,7 @@ import traceback
 
 import cjson
 import datetime
+import requests
 
 class BaseBusiness(object):
 
@@ -112,4 +113,9 @@ class BaseBusiness(object):
         )
 
         return affect
+
+    def get_pic(self):
+        url = 'https://kyfw.12306.cn/otn/passcodeNew/getPassCodeNew?module=login&rand=sjrand&0.289653001120314'
+        r = requests.get(url, verify=False)
+        return r.content
 

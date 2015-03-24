@@ -29,11 +29,6 @@ class YunDamaBusiness(BaseBusiness):
 
     _PLATFORM_CODE = 'yundama'
 
-    def get_pic(self):
-        url = 'https://kyfw.12306.cn/otn/passcodeNew/getPassCodeNew?module=login&rand=sjrand&0.289653001120314'
-        r = requests.get(url, verify=False)
-
-        return r.content
 
     def passcode_identify(self, record_id, image_content, redis_key=''):
         config = self.config
@@ -54,7 +49,7 @@ class YunDamaBusiness(BaseBusiness):
 
             uid = yun_dama.login()
             response_id, result = yun_dama.decode(image_buffer, '6701', 60)
-            logging.info('[%s]Result:[%s][%s]', self._PLATFORM_CODE, response_id, result )
+            logging.debug('[%s]Result:[%s][%s]', self._PLATFORM_CODE, response_id, result )
         except:
             logging.error(traceback.format_exc())
             self.error_record(record_id, 2)
@@ -62,7 +57,7 @@ class YunDamaBusiness(BaseBusiness):
         logging.debug('[%s][%s]Result:%s, %s', self._PLATFORM_CODE, record_id, response_id, result)
         result = self.parse_result(response_id, result)
         if not result:
-            logging.debug('[%s][%s]ResultParseFail:%s', self._PLATFORM_CODE, record_id, result)
+            logging.error('[%s][%s]ResultParseFail:%s', self._PLATFORM_CODE, record_id, result)
             self.error_record(record_id, 3, 1)
             return False
 

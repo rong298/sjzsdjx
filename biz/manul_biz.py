@@ -24,20 +24,20 @@ class ManulBusiness(BaseBusiness):
         # 校验旧文件
         result = self.check_old_image(image_search_key)
         if result:
-            logging.info('[%s][%s]CacheResult:%s', self._PLATFORM_CODE, image_search_key, result)
+            logging.debug('[%s][%s]CacheResult:%s', self._PLATFORM_CODE, image_search_key, result)
             return self.parse_result(record_id, result)
 
         # 创造新文件
         result = self.create_new_image(image_search_key)
         if not result:
-            logging.info('[%s][%s]CreateFail:%s', self._PLATFORM_CODE, image_search_key, result)
+            logging.debug('[%s][%s]CreateFail:%s', self._PLATFORM_CODE, image_search_key, result)
             # self.error_record(record_id, 2)
             # return False
 
         # 同步等待
         result = self.wait(image_search_key)
         if not result:
-            logging.info('[%s][%s]WaitFail:%s', self._PLATFORM_CODE, image_search_key, result)
+            logging.debug('[%s][%s]WaitFail:%s', self._PLATFORM_CODE, image_search_key, result)
             self.error_record(record_id, 3)
             return False
 

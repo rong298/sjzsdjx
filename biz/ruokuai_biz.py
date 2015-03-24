@@ -46,7 +46,7 @@ class RuokuaiBusiness(BaseBusiness):
                 config['token']
             )
             response = rc.rk_create(image_buffer, config['image_type'])
-            logging.info('Result:%s', response)
+            logging.debug('Result:%s', response)
         except:
             logging.error(traceback.format_exc())
             self.error_record(record_id, 2)
