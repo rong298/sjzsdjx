@@ -35,6 +35,7 @@ class BaseBusiness(object):
     MANUL = 'manul'
     DAMA2 = 'dama2'
     RUOKUAI = 'ruokuai'
+    YUNDAMA = 'yundama'
 
     def __init__(self, **kargs):
         self.db = kargs.get('db', None)

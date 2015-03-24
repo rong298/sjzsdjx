@@ -16,9 +16,12 @@
 # under the License.
 
 import os
-import sys
 import logging
 import redis
+
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 from configobj import ConfigObj
 

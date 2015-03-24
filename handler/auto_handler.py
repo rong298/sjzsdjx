@@ -7,6 +7,7 @@ from biz.base_biz import BaseBusiness
 from biz.dama2_biz import Dama2Business
 from biz.manul_biz import ManulBusiness
 from biz.ruokuai_biz import RuokuaiBusiness
+from biz.yundama_biz import YunDamaBusiness
 
 
 from lib.md5_lib import MD5
@@ -47,6 +48,8 @@ class AutoHandler(BaseHandler):
             process_biz = Dama2Business(db=self.db, config=config)
         elif dama_platform == BaseBusiness.RUOKUAI:
             process_biz = RuokuaiBusiness(db=self.db, config=config)
+        elif dama_platform == BaseBusiness.YUNDAMA:
+            process_biz = YunDamaBusiness(db=self.db, config=config)
         else:
             config = self._load_config('/config/%s.ini' % BaseBusiness.RUOKUAI)
             process_biz = RuokuaiBusiness(db=self.db, config=config)
