@@ -32,7 +32,7 @@ class ManulBusiness(BaseBusiness):
         result = self.check_old_image(image_search_key)
         if result:
             logging.debug('[%s][%s]CacheResult:%s', self._PLATFORM_CODE, image_search_key, result)
-            return self.parse_result(record_id, result)
+            return self.parse_result(result)
 
         # 创造新文件
         result = self.create_new_image(image_search_key)
@@ -48,7 +48,7 @@ class ManulBusiness(BaseBusiness):
             self.error_record(record_id, 3)
             return False
 
-        result = self.parse_result(record_id, result)
+        result = self.parse_result(result)
         if not result:
             logging.debug('[%s][%s]ResultParseFail:%s', self._PLATFORM_CODE, record_id, result)
             self.error_record(record_id, 3, 1)
@@ -118,7 +118,7 @@ class ManulBusiness(BaseBusiness):
         logging.error('[%s][%s][%s] ====> TimeOut <====', image_search_key, max_loops, loop_times)
         return False
 
-    def parse_result(self, id, result):
+    def parse_result(self, result):
 
         if 'result' not in result:
             self.error_record(id, 3)
@@ -134,7 +134,7 @@ class ManulBusiness(BaseBusiness):
                 return False
 
         ret = {
-            'dama_token': id,
+            'dama_token': result['id'],
             'position': ','.join(response),
             'origin_result': result['result'],
             'status': 1
