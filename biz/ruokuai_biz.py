@@ -51,10 +51,10 @@ class RuokuaiBusiness(BaseBusiness):
             logging.error(traceback.format_exc())
             self.error_record(record_id, 2)
 
-        logging.debug('[ruokuai][%s]Result:%s', record_id, response)
+        logging.info('[ruokuai][%s]Result:%s', record_id, response)
         result = self.parse_result(response)
         if not result:
-            logging.debug('[ruokuai][%s]ResultParseFail:%s', record_id, result)
+            logging.error('[ruokuai][%s]ResultParseFail:%s', record_id, result)
             self.error_record(record_id, 3, 1)
             return False
 

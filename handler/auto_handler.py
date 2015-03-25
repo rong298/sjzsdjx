@@ -88,7 +88,7 @@ class AutoHandler(BaseHandler):
             'dama_platform': dama_platform,
             'pass_code': result['position']
             }
-        logging.info('[%s][%s]FinalResult:%s,Spend:%s.',dama_platform, record_id, final_out, end_time-start_time)
+        logging.info('[%s][%s][%s][%s]FinalResult:%s,Spend:%s.',dama_platform, record_id, final_out, end_time-start_time)
         self._succ_out(final_out)
 
     def distribute(self, seller_platform, seller, scene=''):

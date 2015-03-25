@@ -55,11 +55,11 @@ class QunarDamaBusiness(BaseBusiness):
             self.error_record(record_id, 2, 1)
             return False
 
-        logging.debug('[%s][%s]Result:%s', self._PLATFORM_CODE, record_id, response.text)
+        logging.info('[%s][%s]Result:%s', self._PLATFORM_CODE, record_id, response.text)
         # 解析结果
         result = self.parse_result(response.text)
         if not result:
-            logging.debug('[%s][%s]ResultParseFail:%s', self._PLATFORM_CODE, record_id, result)
+            logging.error('[%s][%s]ResultParseFail:%s', self._PLATFORM_CODE, record_id, result)
             # 解析失败
             self.error_record(record_id, 3, 1)
             return False

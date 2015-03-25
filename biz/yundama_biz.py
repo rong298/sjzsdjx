@@ -53,7 +53,7 @@ class YunDamaBusiness(BaseBusiness):
             logging.error(traceback.format_exc())
             self.error_record(record_id, 2)
 
-        logging.debug('[%s][%s]Result:%s, %s', self._PLATFORM_CODE, record_id, response_id, result)
+        logging.info('[%s][%s]Result:%s, %s', self._PLATFORM_CODE, record_id, response_id, result)
         result = self.parse_result(response_id, result)
         if not result:
             logging.error('[%s][%s]ResultParseFail:%s', self._PLATFORM_CODE, record_id, result)
