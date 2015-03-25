@@ -57,7 +57,7 @@ class RuoKuai(object):
             return False
 
         logging.info("Notice Response[ruokuai]: %s" % result)
-        if result['Result'] == u'报告成功':
+        if result.has_key('Result') and result['Result'] == u'报告成功':
             return True
         else:
             return False
@@ -72,7 +72,7 @@ class Dama2(object):
         post_data = {'id': query_id}
         response = requests.post(url=url, data=post_data)
         result = response.json()
-        if result['ret'] == '0':
+        if result.has_key('ret') and result['ret'] == '0':
             return True
         return False
 
