@@ -32,8 +32,7 @@ class AutoHandler(BaseHandler):
         # 从数据库中获取分发规则
         dama_platform = self.distribute(seller_platform, seller, scene)
         if not dama_platform:
-            self._fail_out(10003)
-            return
+            self.distribute_code = 9999
 
         # 缓存图片到Redis
         search_key = MD5.create(image)
@@ -53,7 +52,7 @@ class AutoHandler(BaseHandler):
         elif dama_platform == BaseBusiness.YUNDAMA:
             process_biz = YunDamaBusiness(db=self.db, config=config, dis_code=self.distribute_code)
         else:
-            config = self._load_config('/config/%s.ini' % BaseBusiness.RUOKUAI)
+            config = self._load_config('/config/%s.ini' % BaseBusiness.YUNDAMA)
             process_biz = RuokuaiBusiness(db=self.db, config=config, dis_code=self.distribute_code)
 
 

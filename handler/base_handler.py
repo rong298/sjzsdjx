@@ -19,6 +19,7 @@ import base64
 import cjson
 import tornado.web
 import hashlib
+import redis
 from configobj import ConfigObj
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -33,11 +34,17 @@ class BaseHandler(tornado.web.RequestHandler):
 
     @property
     def redis(self):
-        return self.application.redis
+        config = self.application.config
+        return redis.Redis(**config['redis'])
 
     @property
     def query_id(self):
         return self.application.query_id
+
+    @property
+    def config(self):
+        return self.application.config
+
 
     def get(self):
         self._do_get()
