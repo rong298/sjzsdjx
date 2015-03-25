@@ -83,7 +83,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def _do_error_notice(self, params):
         sql = (" UPDATE `pass_code_records` "
-            " SET `status`=5 WHERE `id`=%s "
+            " SET `status`=5,`notice_status`=1 WHERE `id`=%s "
             ) % (params['params']['query_id'])
         affected = self.db.execute_rowcount(sql)
         logging.warn('[Self Frontend] Report Error id:%s row[%s]' % ( 
