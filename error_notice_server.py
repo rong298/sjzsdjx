@@ -11,6 +11,7 @@ import tornado.process
 import lib.database as database
 import time
 from lib.api.ruokuai import RClient as RK
+from lib.api.yundama import YDMHttp
 import traceback
 import requests
 
@@ -31,7 +32,8 @@ _MYSQL_DATABASE = 'pass_code'
 
 _PLATFORM_DAMA2 = 'dama2'
 _PLATFORM_RUOKUAI = 'ruokuai'
-_PLATFORM_QN = 'qn_dama'
+_PLATFORM_QN = 'qunar_dama'
+_PLATFORM_YUNDAMA = 'yundama'
 _PLATFORM_MANUL = 'manul'
 
 
@@ -61,7 +63,6 @@ class RuoKuai(object):
             return False
 
 class Dama2(object):
-
     def __init__(self):
         self.config = ConfigObj(CONFIG_PATH + '/' + _PLATFORM_DAMA2 + '.ini', encoding='UTF8')
 
@@ -74,6 +75,33 @@ class Dama2(object):
         if result['ret'] == '0':
             return True
         return False
+
+class YunDama(object):
+    def __init__(self):
+        self.config = ConfigObj(CONFIG_PATH + '/' + _PLATFORM_YUNDAMA+ '.ini', encoding='UTF8')
+
+    def notice(self, query_id):
+        config = self.config
+        logging.info('Notice ===[yundama]===,query_id:%s', query_id)
+        try:
+            yundama = YDMHttp(
+                username = config['username'].encode("UTF-8"),
+                password = config['password'].encode("UTF-8"),
+                appid = config['appid'].encode("UTF-8"),
+                appkey = config['appkey'].encode("UTF-8")
+            )
+
+            uid = yundama.login()
+            result = yundama.report(query_id)
+        except:
+            logging.error(traceback.format_exc())
+            return False
+
+        logging.info("Notice Response[yundama]: %s" % result)
+        if int(result) == 0:
+            return True
+        else:
+            return False
 
 
 class ErrorNotice(object):
@@ -101,18 +129,20 @@ class ErrorNotice(object):
         platform = error['dama_platform']
         query_id = error['dama_token_key']
 
-        if platform == _PLATFORM_DAMA2:
-            flag = Dama2().notice(query_id=query_id)
-
-        elif platform == _PLATFORM_MANUL:
-            flag = self.notice_manul(query_id=query_id)
-
-        elif platform == _PLATFORM_RUOKUAI:
-            flag = RuoKuai().notice(query_id=query_id)
-
-        elif platform == _PLATFORM_QN:
-            flag = self.notice_qn(query_id)
-        else:
+        try:
+            if platform == _PLATFORM_DAMA2:
+                flag = Dama2().notice(query_id=query_id)
+            elif platform == _PLATFORM_MANUL:
+                flag = self.notice_manul(query_id=query_id)
+            elif platform == _PLATFORM_RUOKUAI:
+                flag = RuoKuai().notice(query_id=query_id)
+            elif platform == _PLATFORM_QN:
+                flag = self.notice_qn(query_id)
+            elif platform == _PLATFORM_YUNDAMA:
+                flag = YunDama().notice(query_id)
+            else:
+                flag = False
+        except:
             flag = False
 
         if flag:
@@ -125,7 +155,7 @@ class ErrorNotice(object):
         affect = self.db.execute_rowcount("UPDATE `pass_code_records` SET notice_status=%s WHERE id=%s", to_status, error['id'])
 
         if affect:
-            logging.info('Update Records [SUCCESS],query_id:%s', query_id)
+            logging.info('Update Records [SUCCESS],query_id:%s,status:%s', query_id, to_status)
         else:
             logging.info('Update Records [FAIL],query_id:%s', query_id)
 
