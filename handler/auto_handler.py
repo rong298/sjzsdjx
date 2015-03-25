@@ -79,16 +79,17 @@ class AutoHandler(BaseHandler):
 
         end_time = datetime.datetime.now()
 
-        logging.info('[%s][%s]Result:%s,Spend:%s.',dama_platform, record_id, result, end_time-start_time)
         # 记录pass_code_records
         process_biz.response_record(record_id, result['dama_token'], end_time, result['origin_result'], result['status'])
 
         # 统一输出返回值
-        self._succ_out({
+        final_out = {
             'query_id': record_id,
             'dama_platform': dama_platform,
             'pass_code': result['position']
-            })
+            }
+        logging.info('[%s][%s]FinalResult:%s,Spend:%s.',dama_platform, record_id, final_out, end_time-start_time)
+        self._succ_out(final_out)
 
     def distribute(self, seller_platform, seller, scene=''):
         logging.debug('[%s,%s,%s] Distribute Start', seller_platform, seller, scene)

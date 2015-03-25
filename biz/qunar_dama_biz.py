@@ -23,6 +23,7 @@ import traceback
 
 import cjson
 import requests
+import base64
 
 from biz.base_biz import BaseBusiness
 
@@ -38,7 +39,12 @@ class QunarDamaBusiness(BaseBusiness):
         # 获取参数
         query_url = "agentCode=%s&orderNo=%s" % (seller, order_id)
         query_url = config['adepter_url'] + query_url
-        query_params = image_content
+        try:
+            query_params = base64.b64decode(image_content)
+        except:
+            query_params = image_content
+
+        #query_params = self.get_pic()
 
         logging.debug('[%s][%s]QueryUrl:%s', self._PLATFORM_CODE, record_id, query_url)
         # 发送请求
