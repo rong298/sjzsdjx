@@ -97,3 +97,5 @@ class RuokuaiBusiness(BaseBusiness):
 
         return ret
 
+    def account_detail(self):
+        pass

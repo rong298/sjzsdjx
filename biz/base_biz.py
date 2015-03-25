@@ -39,6 +39,8 @@ class BaseBusiness(object):
     YUNDAMA = 'yundama'
     QUNARDAMA = 'qunar_dama'
 
+    DAMA_LIST = [DAMA2, RUOKUAI, YUNDAMA]
+
     def __init__(self, **kargs):
         self.db = kargs.get('db', None)
         self.config = kargs.get('config', None)

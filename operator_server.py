@@ -56,6 +56,7 @@ class Application(tornado.web.Application):
         handlers.append((r"/op/platform_change[/]?", OpPlatformChangeHandler))
 
         handlers.append((r"/op/monitor[/]?", OpMonitorHandler))
+        handlers.append((r"/op/balance[/]?", OpBalanceHandler))
 
 
         root_abspath = os.path.dirname(os.path.abspath(sys.argv[0]))
