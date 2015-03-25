@@ -48,7 +48,7 @@ class YunDamaBusiness(BaseBusiness):
 
             uid = yun_dama.login()
             response_id, result = yun_dama.decode(image_buffer, '6701', 60)
-            logging.debug('[%s]Result:[%s][%s]', self._PLATFORM_CODE, response_id, result )
+            logging.debug('[%s]Result:[%s][%s]', self._PLATFORM_CODE, response_id, result)
         except:
             logging.error(traceback.format_exc())
             self.error_record(record_id, 2)
