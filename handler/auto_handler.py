@@ -8,6 +8,7 @@ from biz.dama2_biz import Dama2Business
 from biz.manul_biz import ManulBusiness
 from biz.ruokuai_biz import RuokuaiBusiness
 from biz.yundama_biz import YunDamaBusiness
+from biz.qunar_dama_biz import QunarDamaBusiness
 
 
 from lib.md5_lib import MD5
@@ -51,6 +52,8 @@ class AutoHandler(BaseHandler):
             process_biz = RuokuaiBusiness(db=self.db, config=config, dis_code=self.distribute_code)
         elif dama_platform == BaseBusiness.YUNDAMA:
             process_biz = YunDamaBusiness(db=self.db, config=config, dis_code=self.distribute_code)
+        elif dama_platform == BaseBusiness.QUNARDAMA:
+            process_biz = QunarDamaBusiness(db=self.db, config=config, dis_code=self.distribute_code, order_id=order_id, seller=seller)
         else:
             config = self._load_config('/config/%s.ini' % BaseBusiness.YUNDAMA)
             process_biz = RuokuaiBusiness(db=self.db, config=config, dis_code=self.distribute_code)
@@ -93,12 +96,15 @@ class AutoHandler(BaseHandler):
             "SELECT * FROM `pass_code_config` WHERE seller_platform=%s AND seller=%s AND scene=%s LIMIT 1",
             seller_platform, seller, scene
         )
-        logging.debug('[%s,%s,%s] Distribute ===> %s', seller_platform, seller, scene, dist)
-        if not dist:
-            return False
 
-        dama_platform = dist['dama_platform']
-        self.distribute_code = dist['token']
+        if dist:
+            dama_platform = dist['dama_platform']
+            self.distribute_code = dist['token']
+        else:
+            dama_platform = self.config['default']['dama_platform']
+            self.distribute_code = self.config['default']['dama_token']
+
+        logging.debug('[%s,%s,%s] Distribute ===> %s,%s', seller_platform, seller, scene, dama_platform, self.distribute_code)
         return dama_platform
 
 

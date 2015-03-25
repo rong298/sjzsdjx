@@ -26,54 +26,68 @@ import requests
 
 from biz.base_biz import BaseBusiness
 
-class Dama2Business(BaseBusiness):
+class QunarDamaBusiness(BaseBusiness):
 
-    _PLATFORM_CODE = BaseBusiness.DAMA2
+    _PLATFORM_CODE = BaseBusiness.QUNARDAMA
 
     def passcode_identify(self, record_id, image_content, params=None, redis_key=''):
         config = self.config
+        order_id = self.order_id
+        seller = self.change_seller()
 
         # 获取参数
-        query_params = self.parse_params(image_content)
+        query_url = "agentCode=%s&orderNo=%s" % (seller, order_id)
+        query_url = config['adepter_url'] + query_url
+        query_params = image_content
 
+        logging.debug('[%s][%s]QueryUrl:%s', self._PLATFORM_CODE, record_id, query_url)
         # 发送请求
         try:
-            response = requests.post(config['adepter_url'], data=query_params)
+            response = requests.post(query_url, data=query_params)
         except:
             logging.error(traceback.format_exc())
             self.error_record(record_id, 2, 1)
             return False
 
-        logging.debug('[dama2][%s]Result:%s', record_id, response)
+        logging.debug('[%s][%s]Result:%s', self._PLATFORM_CODE, record_id, response.text)
         # 解析结果
         result = self.parse_result(response.text)
         if not result:
-            logging.debug('[dama2][%s]ResultParseFail:%s', record_id, result)
+            logging.debug('[%s][%s]ResultParseFail:%s', self._PLATFORM_CODE, record_id, result)
             # 解析失败
             self.error_record(record_id, 3, 1)
             return False
-
         return result
 
     def parse_params(self, image_content, image_type=287):
-        params = {
-            'file_type': str(image_type),
-            'content': image_content
-        }
-        return params
+        pass
 
     def parse_result(self, response):
         res = cjson.decode(response)
 
-        if not res.has_key('ret') or res['ret'] != "0":
+        if not res.has_key('ret') or res['ret'] != True:
             # 接口调用失败
             return False
 
+        if u"打码错误" in response or "EEEF" in response:
+            return False
+
         ret = {
-            'dama_token': res['id'],
-            'position': res['result'].replace('|', ","),
-            'origin_result': res['result'],
+            'dama_token': 'QunarNoToken',
+            'position': res['data']['passcode'],
+            'origin_result': response,
             'status': 1
         }
 
         return ret
+
+    def change_seller(self):
+
+        if self.seller == 'yh':
+            code = 'mcslw'
+        elif self.seller == 'dh':
+            code = 'dongf'
+        else:
+            code = False
+
+        return code

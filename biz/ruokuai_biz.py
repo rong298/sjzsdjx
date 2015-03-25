@@ -26,7 +26,7 @@ import base64
 
 class RuokuaiBusiness(BaseBusiness):
 
-    _PLATFORM_CODE = 'ruokuai'
+    _PLATFORM_CODE = BaseBusiness.RUOKUAI
 
 
     def passcode_identify(self, record_id, image_content, params=None, redis_key=''):

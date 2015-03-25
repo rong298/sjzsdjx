@@ -15,7 +15,7 @@ import random
 
 class ManulBusiness(BaseBusiness):
 
-    _PLATFORM_CODE = 'manul'
+    _PLATFORM_CODE = BaseBusiness.MANUL
 
     def passcode_identify(self, record_id,  image_content, params={}, redis_key=''):
         # 图片标的

@@ -27,7 +27,7 @@ import requests
 
 class YunDamaBusiness(BaseBusiness):
 
-    _PLATFORM_CODE = 'yundama'
+    _PLATFORM_CODE = BaseBusiness.YUNDAMA
 
     def passcode_identify(self, record_id, image_content, params=None, redis_key=''):
         config = self.config

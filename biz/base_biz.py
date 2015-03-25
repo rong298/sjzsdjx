@@ -37,12 +37,15 @@ class BaseBusiness(object):
     DAMA2 = 'dama2'
     RUOKUAI = 'ruokuai'
     YUNDAMA = 'yundama'
+    QUNARDAMA = 'qunar_dama'
 
     def __init__(self, **kargs):
         self.db = kargs.get('db', None)
         self.config = kargs.get('config', None)
         self.app_config = kargs.get('app_config', None)
         self.dis_code = kargs.get('dis_code', None)
+        self.order_id = kargs.get('order_id', None)
+        self.seller = kargs.get('seller', None)
 
     def get_local_ip(self, ifname): 
         #s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
