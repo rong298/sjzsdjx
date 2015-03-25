@@ -27,6 +27,14 @@ class OpPlatformViewHandler(BaseHandler):
     '''
     打码平台配置查看
     '''
+
+    def _do_get(self):
+        config = self.config
+        op_config = config['op']
+        monitor_term = op_config['monitor_term']
+        op_biz = OpBusiness(db=self.db)
+        monitor_data = op_biz.normal_monitor(monitor_term)
+
     pass
 
 class OpPlatformChangeHandler(BaseHandler):

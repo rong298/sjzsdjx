@@ -105,7 +105,7 @@ class AutoHandler(BaseHandler):
             dama_platform = self.config['default']['dama_platform']
             self.distribute_code = self.config['default']['dama_token']
 
-        logging.debug('[%s,%s,%s] Distribute ===> %s,%s', seller_platform, seller, scene, dama_platform, self.distribute_code)
+        logging.info('[%s,%s,%s] Distribute ===> %s,%s', seller_platform, seller, scene, dama_platform, self.distribute_code)
         return dama_platform
 
 
