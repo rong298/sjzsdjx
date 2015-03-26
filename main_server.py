@@ -52,13 +52,6 @@ class Application(tornado.web.Application):
         # 打码查询接口路由
         handlers.append((r"/dama[/]?", AutoHandler))
 
-        # 手工打码输入界面路由
-        handlers.append((r"/manul_dama/login[/]?", ManulLoginHandler))
-        handlers.append((r"/manul_dama/login_process[/]?", ManulLoginProcessHandler))
-        handlers.append((r"/manul_dama/search[/]?", ManulSearchHandler))
-        handlers.append((r"/manul_dama/input[/]?", ManulInputHandler))
-
-
         root_abspath = os.path.dirname(
                 os.path.abspath(sys.argv[0]))
         web_root = os.path.dirname(__file__)

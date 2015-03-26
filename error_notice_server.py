@@ -20,7 +20,7 @@ import os, sys
 from configobj import ConfigObj
 
 
-define("num_processes", default=1, type=int, help="Starts multiple worker processes")
+define("proc", default=1, type=int, help="Starts multiple worker processes")
 define("query_id", default='', type=str, help="code query id")
 
 
@@ -191,8 +191,8 @@ def signal_handler(signal, frame):
 def main():
     signal.signal(signal.SIGINT, signal_handler)
     tornado.options.parse_command_line()
-    if options.num_processes != 1:
-        tornado.process.fork_processes(options.num_processes)
+    if options.proc!= 1:
+        tornado.process.fork_processes(options.proc)
     ErrorNotice().start()
 
 if __name__ == '__main__':
