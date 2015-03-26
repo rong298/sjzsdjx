@@ -81,7 +81,6 @@ class BaseBusiness(object):
                 'dis_code': self.dis_code,
                 'scene': scene,
                 'start_time': start_time,
-                'end_time': start_time,
                 'server_address': self.get_local_ip('eth1'),
                 'query_address': remote_ip,
                 'result': '',
@@ -112,12 +111,13 @@ class BaseBusiness(object):
 
         return affect
 
-    def error_record(self, id, status, notice_status=0):
+    def error_record(self, id, status, notice_status=0, dama_platform_token=''):
         affect = self.db.execute_rowcount(
-            "UPDATE `pass_code_records` SET status=%s,notice_status=%s,end_time=%s WHERE id=%s",
+            "UPDATE `pass_code_records` SET status=%s,notice_status=%s,end_time=%s,dama_token_key=%s WHERE id=%s",
             status,
             notice_status,
             str(datetime.datetime.now()),
+            dama_platform_token,
             id
         )
 

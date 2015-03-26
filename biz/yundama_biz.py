@@ -54,10 +54,9 @@ class YunDamaBusiness(BaseBusiness):
             self.error_record(record_id, 2)
 
         logging.info('[%s][%s]Result:%s, %s', self._PLATFORM_CODE, record_id, response_id, response)
-        result = self.parse_result(response_id, response)
+        result = self.parse_result(record_id, response_id, response)
         if not result:
             logging.error('[%s][%s]ResultParseFail:%s', self._PLATFORM_CODE, record_id, response)
-            self.error_record(record_id, 3, 1)
             return False
 
         return result
@@ -66,11 +65,13 @@ class YunDamaBusiness(BaseBusiness):
     def parse_params(self):
         pass
 
-    def parse_result(self, id, res):
+    def parse_result(self, r_id, id, res):
         if not res:
+            self.error_record(r_id, 3)
             return False
 
         if id < 0:
+            self.error_record(r_id, 3)
             return False
 
         code = str(res)
@@ -79,6 +80,7 @@ class YunDamaBusiness(BaseBusiness):
         pattern = re.compile(r'^[1-8]{1,8}$')
         match = pattern.match(code)
         if not match:
+            self.error_record(r_id, 4, 1, dama_platform_token=id)
             return False
 
         # 获取坐标

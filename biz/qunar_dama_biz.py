@@ -52,30 +52,31 @@ class QunarDamaBusiness(BaseBusiness):
             response = requests.post(query_url, data=query_params)
         except:
             logging.error(traceback.format_exc())
-            self.error_record(record_id, 2, 1)
+            self.error_record(record_id, 2)
             return False
 
         logging.info('[%s][%s]Result:%s', self._PLATFORM_CODE, record_id, response.text)
         # 解析结果
-        result = self.parse_result(response.text)
+        result = self.parse_result(record_id, response.text)
         if not result:
             logging.error('[%s][%s]ResultParseFail:%s', self._PLATFORM_CODE, record_id, response.text)
             # 解析失败
-            self.error_record(record_id, 3, 1)
             return False
         return result
 
     def parse_params(self, image_content, image_type=287):
         pass
 
-    def parse_result(self, response):
+    def parse_result(self, r_id, response):
         res = cjson.decode(response)
 
         if not res.has_key('ret') or res['ret'] != True:
+            self.error_record(r_id, 3)
             # 接口调用失败
             return False
 
         if u"打码错误" in response or "EEEF" in response:
+            self.error_record(r_id, 4)
             return False
 
         ret = {

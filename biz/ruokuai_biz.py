@@ -52,10 +52,9 @@ class RuokuaiBusiness(BaseBusiness):
             self.error_record(record_id, 2)
 
         logging.info('[ruokuai][%s]Result:%s', record_id, response)
-        result = self.parse_result(response)
+        result = self.parse_result(record_id, response)
         if not result:
             logging.error('[ruokuai][%s]ResultParseFail:%s', record_id, response)
-            self.error_record(record_id, 3, 1)
             return False
 
         return result
@@ -64,11 +63,13 @@ class RuokuaiBusiness(BaseBusiness):
     def parse_params(self):
         pass
 
-    def parse_result(self, res):
+    def parse_result(self, r_id, res):
         if res.has_key('Error_Code'):
+            self.error_record(r_id, 3)
             return False
 
         if not res.has_key('Result'):
+            self.error_record(r_id, 3)
             return False
 
         code = str(res['Result'])
@@ -77,6 +78,7 @@ class RuokuaiBusiness(BaseBusiness):
         pattern = re.compile(r'^[1-8]{1,8}$')
         match = pattern.match(code)
         if not match:
+            self.error_record(r_id, status=4,notice_status=1, dama_platform_token=res['Id'])
             return False
 
         # 获取坐标

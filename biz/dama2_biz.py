@@ -41,16 +41,14 @@ class Dama2Business(BaseBusiness):
             response = requests.post(config['adepter_url'], data=query_params)
         except:
             logging.error(traceback.format_exc())
-            self.error_record(record_id, 2, 1)
+            self.error_record(record_id, 2)
             return False
 
         logging.info('[dama2][%s]Result:%s', record_id, response.text)
         # 解析结果
-        result = self.parse_result(response.text)
+        result = self.parse_result(record_id, response.text)
         if not result:
             logging.error('[dama2][%s]ResultParseFail:%s', record_id, response.text)
-            # 解析失败
-            self.error_record(record_id, 3, 1)
             return False
 
         return result
@@ -62,11 +60,12 @@ class Dama2Business(BaseBusiness):
         }
         return params
 
-    def parse_result(self, response):
+    def parse_result(self, r_id, response):
         res = cjson.decode(response)
 
         if not res.has_key('ret') or res['ret'] != "0":
             # 接口调用失败
+            self.error_record(r_id, 3)
             return False
 
         ret = {
