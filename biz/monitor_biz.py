@@ -30,7 +30,7 @@ class MonitorBusiness(BaseBusiness):
 
     def get_timeout_ratio(self, term, timeout=60):
         dp_num = self.db.query(
-            "SELECT dama_platform,avg(TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(UNIX_TIMESTAMP(start_time)), FROM_UNIXTIME(UNIX_TIMESTAMP(end_time))) as spendtime FROM `pass_code_records` WHERE created>=DATE_SUB(NOW(),INTERVAL %s MINUTE) and status!=0 group by dama_platform", term
+            "SELECT dama_platform,avg(TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(UNIX_TIMESTAMP(start_time)), FROM_UNIXTIME(UNIX_TIMESTAMP(end_time)))) as spendtime FROM `pass_code_records` WHERE created>=DATE_SUB(NOW(),INTERVAL %s MINUTE) and status!=0 group by dama_platform", term
         )
         error_monitor = []
         for su in dp_num:
