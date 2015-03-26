@@ -7,7 +7,6 @@ then
 else
 	echo "Stop Process ..."
         ps -ef|grep "main_server.py"|grep -v grep|awk {'print $2'}|xargs kill -9
-	sleep(2)
 fi
 
 process_num=`ps -ef|grep 'main_server.py'|grep -v 'grep'|wc -l`
