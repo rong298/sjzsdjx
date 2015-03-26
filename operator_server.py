@@ -36,6 +36,7 @@ from lib import database
 from timer.main_processor_checker import MainProcessorChecker
 from handler.manul_input_handler import *
 from handler.op_handler import *
+from handler.monitor_handler import *
 
 define("port", default=10010, help="run on the given port", type=int)
 define("proc", default=2, help="the number of system processes", type=int)
@@ -58,6 +59,9 @@ class Application(tornado.web.Application):
         handlers.append((r"/op/monitor[/]?", OpMonitorHandler))
         handlers.append((r"/op/balance[/]?", OpBalanceHandler))
 
+        # 监控接口
+        handlers.append((r"/monitor/error[/]?", MonitorErrorHandler))
+        handlers.append((r"/monitor/timeout[/]?", MonitorTimeOutHandler))
 
         root_abspath = os.path.dirname(os.path.abspath(sys.argv[0]))
         web_root = os.path.dirname(__file__)
