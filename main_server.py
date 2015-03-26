@@ -37,7 +37,7 @@ from timer.main_processor_checker import MainProcessorChecker
 from handler.auto_handler import AutoHandler
 from handler.manul_input_handler import *
 
-define("port", default=9001, help="run on the given port", type=int)
+define("port", default=10008, help="run on the given port", type=int)
 define("proc", default=2, help="the number of system processes", type=int)
 define("proxies", default='', help="Proxies for requests")
 define("platform", default='auto', help="auto自动切换，ruokuai若快; dama2 打码2; qn_dama去哪儿; manul人工")

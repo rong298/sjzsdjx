@@ -34,10 +34,10 @@ from lib.md5_lib import MD5
 
 from lib import database
 from timer.main_processor_checker import MainProcessorChecker
+from handler.auto_handler import AutoHandler
 from handler.manul_input_handler import *
-from handler.op_handler import *
 
-define("port", default=10010, help="run on the given port", type=int)
+define("port", default=10009, help="run on the given port", type=int)
 define("proc", default=2, help="the number of system processes", type=int)
 define("proxies", default='', help="Proxies for requests")
 
@@ -48,18 +48,15 @@ class Application(tornado.web.Application):
     def __init__(self):
         handlers = []
 
-        # 打码控制平台
-        handlers.append((r"/op/login[/]?", OpLoginHandler))
-        handlers.append((r"/op/login_process[/]?", OpLoginProcessHandler))
-
-        handlers.append((r"/op/platform_view[/]?", OpPlatformViewHandler))
-        handlers.append((r"/op/platform_change[/]?", OpPlatformChangeHandler))
-
-        handlers.append((r"/op/monitor[/]?", OpMonitorHandler))
-        handlers.append((r"/op/balance[/]?", OpBalanceHandler))
+        # 手工打码输入界面路由
+        handlers.append((r"/manul_dama/login[/]?", ManulLoginHandler))
+        handlers.append((r"/manul_dama/login_process[/]?", ManulLoginProcessHandler))
+        handlers.append((r"/manul_dama/search[/]?", ManulSearchHandler))
+        handlers.append((r"/manul_dama/input[/]?", ManulInputHandler))
 
 
-        root_abspath = os.path.dirname(os.path.abspath(sys.argv[0]))
+        root_abspath = os.path.dirname(
+                os.path.abspath(sys.argv[0]))
         web_root = os.path.dirname(__file__)
 
         config = ConfigObj(root_abspath + '/config/config_online.ini',
