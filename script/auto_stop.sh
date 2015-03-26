@@ -1,16 +1,16 @@
 #!/bin/bash
-process_num=`ps -ef|grep platform=auto|grep -v 'grep'|wc -l`
+process_num=`ps -ef|grep 'main_server.py'|grep -v 'grep'|wc -l`
 
 if [ $process_num == 0 ]
 then
 	echo "There is no process need kill"
 else
 	echo "Stop Process ..."
-        ps -ef|grep "=auto"|grep -v grep|awk {'print $2'}|xargs kill -9
+        ps -ef|grep "main_server.py"|grep -v grep|awk {'print $2'}|xargs kill -9
 	sleep(2)
 fi
 
-process_num=`ps -ef|grep platform=auto|grep -v 'grep'|wc -l`
+process_num=`ps -ef|grep 'main_server.py'|grep -v 'grep'|wc -l`
 
 if [ $process_num > 0 ]
 then

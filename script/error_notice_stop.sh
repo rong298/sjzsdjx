@@ -1,15 +1,15 @@
 #!/bin/bash
-process_num=`ps -ef|grep 'error_notice_server'|grep -v 'grep'|wc -l`
+process_num=`ps -ef|grep 'error_notice_server.py'|grep -v 'grep'|wc -l`
 
 if [ $process_num == 0 ]
 then
 	echo "There is no process need kill"
 else
 	echo "Stop Process ..."
-        ps -ef|grep "error_notice_server"|grep -v grep|awk {'print $2'}|xargs kill -9
+        ps -ef|grep "error_notice_server.py"|grep -v grep|awk {'print $2'}|xargs kill -9
 fi
 
-process_num=`ps -ef|grep 'error_notice_server'|grep -v 'grep'|wc -l`
+process_num=`ps -ef|grep 'error_notice_server.py'|grep -v 'grep'|wc -l`
 
 if [ $process_num > 0 ]
 then

@@ -1,5 +1,5 @@
 #!/bin/bash
-process_num=`ps -ef|grep platform=auto|grep -v 'grep'|wc -l`
+process_num=`ps -ef|grep 'main_server.py'|grep -v 'grep'|wc -l`
 
 if [ $process_num == 0 ]
 then
@@ -9,7 +9,7 @@ else
 	echo "Already Started, Please Stop then start"
 fi
 
-process_num=`ps -ef|grep platform=auto|grep -v 'grep'|wc -l`
+process_num=`ps -ef|grep 'main_server.py'|grep -v 'grep'|wc -l`
 
 if [ $process_num > 200 ]
 then
