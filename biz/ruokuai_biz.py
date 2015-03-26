@@ -54,7 +54,7 @@ class RuokuaiBusiness(BaseBusiness):
         logging.info('[ruokuai][%s]Result:%s', record_id, response)
         result = self.parse_result(response)
         if not result:
-            logging.error('[ruokuai][%s]ResultParseFail:%s', record_id, result)
+            logging.error('[ruokuai][%s]ResultParseFail:%s', record_id, response)
             self.error_record(record_id, 3, 1)
             return False
 

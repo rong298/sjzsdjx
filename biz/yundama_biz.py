@@ -47,16 +47,16 @@ class YunDamaBusiness(BaseBusiness):
             )
 
             uid = yun_dama.login()
-            response_id, result = yun_dama.decode(image_buffer, '6701', 60)
-            logging.debug('[%s]Result:[%s][%s]', self._PLATFORM_CODE, response_id, result)
+            response_id, response = yun_dama.decode(image_buffer, '6701', 60)
+            logging.debug('[%s]Result:[%s][%s]', self._PLATFORM_CODE, response_id, response)
         except:
             logging.error(traceback.format_exc())
             self.error_record(record_id, 2)
 
-        logging.info('[%s][%s]Result:%s, %s', self._PLATFORM_CODE, record_id, response_id, result)
-        result = self.parse_result(response_id, result)
+        logging.info('[%s][%s]Result:%s, %s', self._PLATFORM_CODE, record_id, response_id, response)
+        result = self.parse_result(response_id, response)
         if not result:
-            logging.error('[%s][%s]ResultParseFail:%s', self._PLATFORM_CODE, record_id, result)
+            logging.error('[%s][%s]ResultParseFail:%s', self._PLATFORM_CODE, record_id, response)
             self.error_record(record_id, 3, 1)
             return False
 

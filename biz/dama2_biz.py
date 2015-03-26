@@ -44,11 +44,11 @@ class Dama2Business(BaseBusiness):
             self.error_record(record_id, 2, 1)
             return False
 
-        logging.info('[dama2][%s]Result:%s', record_id, response)
+        logging.info('[dama2][%s]Result:%s', record_id, response.text)
         # 解析结果
         result = self.parse_result(response.text)
         if not result:
-            logging.error('[dama2][%s]ResultParseFail:%s', record_id, result)
+            logging.error('[dama2][%s]ResultParseFail:%s', record_id, response.text)
             # 解析失败
             self.error_record(record_id, 3, 1)
             return False
