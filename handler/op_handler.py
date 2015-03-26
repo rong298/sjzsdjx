@@ -56,10 +56,26 @@ class OpMonitorHandler(BaseHandler):
 
         # 获取数据
         monitor_data = op_biz.normal_monitor(monitor_term)
+
+        ratio = {}
+        for it in monitor_data:
+            da = it['dama_platform']
+            status = int(it['status'])
+            count = it['count']
+            if not ratio.has_key(da):
+                ratio[da] = {'succ': 0, 'fail': 0}
+
+            if status == 1:
+                ratio[da]['succ'] = count
+            else:
+                ratio[da]['fail'] += count
+
+
         logging.debug('[OP][NormalMonitor]%s', monitor_data)
         self.render('normal_monitor.html',
                     items = monitor_data,
-                    monitor_term = monitor_term
+                    monitor_term = monitor_term,
+                    ratio = ratio
                     )
         return
 
