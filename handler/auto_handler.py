@@ -92,7 +92,7 @@ class AutoHandler(BaseHandler):
         self._succ_out(final_out)
 
     def distribute(self, seller_platform, seller, scene=''):
-        logging.debug('[%s,%s,%s] Distribute Start', seller_platform, seller, scene)
+        logging.info('[%s,%s,%s] Distribute Start', seller_platform, seller, scene)
         dist = self.db.get(
             "SELECT * FROM `pass_code_config` WHERE seller_platform=%s AND seller=%s AND scene=%s LIMIT 1",
             seller_platform, seller, scene
