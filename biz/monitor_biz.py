@@ -3,6 +3,7 @@
 __author__ = 'Jacky'
 
 from biz.base_biz import BaseBusiness
+import logging
 
 class MonitorBusiness(BaseBusiness):
 
@@ -13,16 +14,19 @@ class MonitorBusiness(BaseBusiness):
        dp_error_num = self.db.query(
            "SELECT dama_platform,count(1) as co FROM `pass_code_records` WHERE created>=DATE_SUB(NOW(),INTERVAL %s MINUTE) and status!=1 and status!=0 group by dama_platform", term
        )
+       logging.info(dp_num)
+       logging.info(dp_error_num) 
        error_monitor = []
        for su in dp_num:
            da = su['dama_platform']
-           co = int(su['co'])
+           co = float(su['co'])
            ratio = 0
            for esu in dp_error_num:
                da_e = esu['dama_platform']
-               co_e = int(esu['co'])
+               co_e = float(esu['co'])
                if da == da_e:
                    ratio = float(co_e/co)
+                   logging.info('%s,%s,%s', co_e,co,ratio)
                    break
            if ratio > float(error_ratio):
                error_monitor.append(da)
