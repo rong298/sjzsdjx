@@ -20,9 +20,9 @@ class MonitorErrorHandler(BaseHandler):
         error_info = monitor_biz.get_error_ratio(monitor_term, error_ratio)
 
         if not error_info:
-            self.write("SUCCESS")
+            self.write("OK")
         else:
-            self.write("%s,错误率超过%s,取样时间%s", ','.join(error_info), error_ratio, monitor_term)
+            self.write("%s,错误率超过%s,取样时间%s" % (','.join(error_info), error_ratio, monitor_term))
         return
 
 class MonitorTimeOutHandler(BaseHandler):
@@ -39,9 +39,9 @@ class MonitorTimeOutHandler(BaseHandler):
         error_info = monitor_biz.get_timeout_ratio(monitor_term, timeout)
 
         if not error_info:
-            self.write("SUCCESS")
+            self.write("OK")
         else:
-            self.write("%s,平均处理时间超过%s,取样时间%s", ','.join(error_info), timeout, monitor_term)
+            self.write("%s,平均处理时间超过%s,取样时间%s" % (','.join(error_info), timeout, monitor_term))
 
         return
 
