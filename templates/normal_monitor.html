@@ -37,8 +37,7 @@
             </div>
             <p>(0:接口调用中&nbsp;1:成功&nbsp;2:打码平台500错误&nbsp;3:打码平台返回错误&nbsp;4:打码平台数据格式错误&nbsp;5:12306验证错误)</p>
             <div class="well bs-component">
-                <h3> 打码平台成功率统计({{monitor_term}} 分钟)</h3>
-                <table  align="center" width="60%" height="60%" border="3px" cellpadding="0" cellspacing="0">
+                <table  align="center" width="60%" height="100px" border="3px" cellpadding="0" cellspacing="0">
                     <tr>
                         <th>打码平台编码</th>
                         <th>成功率</th>
@@ -52,7 +51,7 @@
                     {% for it in ratio %}
                     <tr>
                         <td align="center">{{it}}</td>
-                        <td align="center">{{"%.2f" % float(it['succ'])/float(it['succ']+it['fail'])*100}}</td>
+                        <td align="center">{{float(ratio[it]['succ'])/float(ratio[it]['succ']+ratio[it]['fail'])}}</td>
                     </tr>
                     {% end %}
                     {% end %}
