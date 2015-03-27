@@ -109,7 +109,8 @@ class AutoHandler(BaseHandler):
 
         if not dist:
             dist = self.db.get(
-                "SELECT * FROM `pass_code_config` WHERE seller_platform='default' AND seller='default' AND scene='default' LIMIT 1"
+                "SELECT * FROM `pass_code_config` WHERE seller_platform=s AND seller=%s AND scene='default' LIMIT 1",
+                seller_platform, seller
             )
 
         if dist:
