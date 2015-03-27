@@ -9,6 +9,7 @@ from biz.manul_biz import ManulBusiness
 from biz.ruokuai_biz import RuokuaiBusiness
 from biz.yundama_biz import YunDamaBusiness
 from biz.qunar_dama_biz import QunarDamaBusiness
+from biz.yunsu_biz import YunsuBusiness
 
 
 from lib.md5_lib import MD5
@@ -54,6 +55,8 @@ class AutoHandler(BaseHandler):
             process_biz = YunDamaBusiness(db=self.db, config=config, dis_code=self.distribute_code)
         elif dama_platform == BaseBusiness.QUNARDAMA:
             process_biz = QunarDamaBusiness(db=self.db, config=config, dis_code=self.distribute_code, order_id=order_id, seller=seller)
+        elif dama_platform == BaseBusiness.YUNSU:
+            process_biz = YunsuBusiness(db=self.db, config=config, dis_code=self.distribute_code)
         else:
             config = self._load_config('/config/%s.ini' % BaseBusiness.YUNDAMA)
             process_biz = RuokuaiBusiness(db=self.db, config=config, dis_code=self.distribute_code)
@@ -106,13 +109,16 @@ class AutoHandler(BaseHandler):
 
         if not dist:
             dist = self.db.get(
-                "SELECT * FROM `pass_code_config` WHERE seller_platform='default' AND seller='default' AND scene='default' LIMIT 1",
+                "SELECT * FROM `pass_code_config` WHERE seller_platform=s AND seller=%s AND scene='default' LIMIT 1",
+                seller_platform, seller
             )
 
         if dist:
             dama_platform = dist['dama_platform']
             self.distribute_code = dist['token']
-        else:
+
+
+        if not dist:
             dama_platform = self.config['default']['dama_platform']
             self.distribute_code = self.config['default']['dama_token']
 

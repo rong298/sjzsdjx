@@ -18,6 +18,7 @@ import requests
 from tornado.options import define, options
 import os, sys
 from configobj import ConfigObj
+from biz.base_biz import BaseBusiness
 
 
 define("proc", default=1, type=int, help="Starts multiple worker processes")
@@ -30,11 +31,12 @@ _MYSQL_PASSWORD = 'kyfw100+'
 _MYSQL_DATABASE = 'pass_code'
 
 
-_PLATFORM_DAMA2 = 'dama2'
-_PLATFORM_RUOKUAI = 'ruokuai'
-_PLATFORM_QN = 'qunar_dama'
-_PLATFORM_YUNDAMA = 'yundama'
-_PLATFORM_MANUL = 'manul'
+_PLATFORM_DAMA2 = BaseBusiness.DAMA2
+_PLATFORM_RUOKUAI = BaseBusiness.RUOKUAI
+_PLATFORM_QN = BaseBusiness.RUOKUAI
+_PLATFORM_YUNDAMA = BaseBusiness.YUNDAMA
+_PLATFORM_MANUL = BaseBusiness.MANUL
+_PLATFORM_YUNSU = BaseBusiness.YUNSU
 
 
 ABSPATH = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -61,6 +63,28 @@ class RuoKuai(object):
             return True
         else:
             return False
+
+class YunSu(object):
+
+    def __init__(self):
+        self.config = ConfigObj(CONFIG_PATH + '/' + _PLATFORM_YUNSU + '.ini', encoding='UTF8')
+
+    def notice(self, query_id):
+        ruokuai = self.config
+        logging.info('Notice ===[yunsu]===,query_id:%s', query_id)
+        try:
+            rc = RK(ruokuai['account'], ruokuai['password'], ruokuai['code'], ruokuai['token'])
+            result = rc.rk_report_error(query_id)
+        except:
+            logging.error(traceback.format_exc())
+            return False
+
+        logging.info("Notice Response[yunsu]: %s" % result)
+        if result.has_key('Result') and result['Result'] == u'报告成功':
+            return True
+        else:
+            return False
+
 
 class Dama2(object):
     def __init__(self):
