@@ -48,6 +48,14 @@ class OpMonitorHandler(BaseHandler):
     打码平台监控页面
     '''
 
+    status_dict = {
+        '1' : u'成功',
+        '2' : u'打码平台服务器异常',
+        '3' : u'打码平台返回数据异常',
+        '4' : u'打码平台数据胡填',
+        '5' : u'前端验证错误',
+    }
+
     def _do_get(self):
         config = self.config
         op_config = config['op']
@@ -75,7 +83,8 @@ class OpMonitorHandler(BaseHandler):
         self.render('normal_monitor.html',
                     items = monitor_data,
                     monitor_term = monitor_term,
-                    ratio = ratio
+                    ratio = ratio,
+                    status_dict = self.status_dict
                     )
         return
 
