@@ -96,6 +96,7 @@ class BaseBusiness(object):
                         "`, `".join(map(self.any_to_str, record.keys())),
                         "', '".join(map(self.any_to_str, record.values()))
                         )
+        logging.debug('Record %s',sql)
         id = self.db.execute_lastrowid(sql)
         return id
 

@@ -140,8 +140,7 @@ class AutoHandler(BaseHandler):
 
         if not item:
             item = self.db.get(
-                "SELECT * FROM `pass_code_config` WHERE seller_platform='default' AND seller='dafault' AND scene='default' LIMIT 1",
-                seller_platform, seller
+                "SELECT * FROM `pass_code_config` WHERE seller_platform='default' AND seller='dafault' AND scene='default' LIMIT 1"
             )
 
         if item:
