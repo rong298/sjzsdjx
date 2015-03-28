@@ -32,9 +32,7 @@ class AutoHandler(BaseHandler):
         image = params['content']
 
         # 从数据库中获取分发规则
-        dama_platform = self.distribute(seller_platform, seller, scene)
-        if not dama_platform:
-            self.distribute_code = 9999
+        dama_platform = self.distribute_v2(seller_platform, seller, scene)
 
         # 缓存图片到Redis
         search_key = MD5.create(image)
@@ -123,6 +121,72 @@ class AutoHandler(BaseHandler):
 
         logging.info('[%s,%s,%s] Distribute ===> %s,%s', seller_platform, seller, scene, dama_platform, self.distribute_code)
         return dama_platform
+
+    def distribute_v2(self, seller_platform, seller, scene=''):
+        '''
+        使用Redis
+        :param seller_platform:
+        :param seller:
+        :param scene:
+        :return:
+        '''
+        # 校验缓存
+        if self.refresh_redis():
+            logging.info("Refresh Distribute Redis Success")
+
+        # Redis key 构造
+        redis_key = '_'.join([seller_platform, seller, scene])
+
+        # 查询Redis
+        item = self.redis.get(redis_key)
+
+        if not item:
+            redis_key = '_'.join([seller_platform, seller, 'default'])
+            item = self.redis.get(redis_key)
+
+        if not item:
+            redis_key = '_'.join(['default', 'default', 'default'])
+            item = self.redis.get(redis_key)
+
+        if item:
+            dama_platform = item['dama_platform']
+            self.distribute_code = item['token']
+        else:
+            dama_platform = self.config['default']['dama_platform']
+            self.distribute_code = self.config['default']['dama_token']
+
+        logging.info('[%s,%s,%s] Distribute ===> %s,%s', seller_platform, seller, scene, dama_platform, self.distribute_code)
+        return dama_platform
+
+
+    def refresh_redis(self):
+        # 三分钟前的时间
+        now = datetime.datetime.now()
+
+        # 比较是否要更新时间
+        redis_config_key = 'pass_code_config_redis_cache_key'
+
+        last_update_time = self.redis.get(redis_config_key)
+        delta = datetime.timedelta(minutes = 3)
+        last_update_time = last_update_time + delta
+
+        # 还未过期
+        if last_update_time < now:
+            return False
+
+        # 已过期，需要重新更新redis
+        items = self.db.query(
+            "SELECT * FROM `pass_code_config`"
+        )
+        for it in items:
+            redis_key = '_'.join[it['seller_platform'], it['seller'], it['scene']]
+            self.redis.set(redis_key, it['dama_platform'])
+            self.redis.expire(redis_key, 60*3)
+
+        # 更新标志位
+        self.redis.set(redis_config_key, datetime.datetime.now())
+
+        return True
 
 
 
