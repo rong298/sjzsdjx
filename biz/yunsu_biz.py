@@ -37,7 +37,8 @@ class YunsuBusiness(BaseBusiness):
         except:
             image_buffer = image_content
 
-        image_buffer = self.get_pic()
+        # Just For Test
+        #image_buffer = self.get_pic()
 
         try:
             rc = YSlient(
