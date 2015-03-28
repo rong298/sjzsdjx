@@ -40,6 +40,8 @@ class YunsuBusiness(BaseBusiness):
         # Just For Test
         #image_buffer = self.get_pic()
 
+
+
         try:
             rc = YSlient(
                 config['account'],
