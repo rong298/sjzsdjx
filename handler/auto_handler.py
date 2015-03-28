@@ -16,12 +16,12 @@ from lib.md5_lib import MD5
 import base64
 import datetime
 import logging
+import cjson
 
 
 class AutoHandler(BaseHandler):
 
     def _do_query_dama(self, params):
-
         # 参数校验
         params = params['params']
         seller_platform = params['seller_platform']
@@ -31,6 +31,8 @@ class AutoHandler(BaseHandler):
         order_id = params.get('order_id', '')
         image = params['content']
 
+        logging.info('NewQuery ==> %s,%s,%s', seller_platform, seller, scene)
+
         # 从数据库中获取分发规则
         dama_platform = self.distribute_v2(seller_platform, seller, scene)
 
@@ -39,7 +41,7 @@ class AutoHandler(BaseHandler):
         self.redis.set(search_key, base64.b64encode(image))
         self.redis.expire(search_key, 60*10)
 
-        config = self._load_config('/config/%s.ini' % dama_platform)
+        config = self.dp_config[dama_platform][seller]
 
         # 启动Biz
         process_biz = None
@@ -56,9 +58,8 @@ class AutoHandler(BaseHandler):
         elif dama_platform == BaseBusiness.YUNSU:
             process_biz = YunsuBusiness(db=self.db, config=config, dis_code=self.distribute_code)
         else:
-            config = self._load_config('/config/%s.ini' % BaseBusiness.YUNDAMA)
+            config = self.dp_config[BaseBusiness.RUOKUAI]
             process_biz = RuokuaiBusiness(db=self.db, config=config, dis_code=self.distribute_code)
-
 
         # 记录pass_code_records
         start_time = datetime.datetime.now()
@@ -131,22 +132,17 @@ class AutoHandler(BaseHandler):
         :return:
         '''
         # 校验缓存
-        if self.refresh_redis():
+        if self.check_redis():
             logging.info("Refresh Distribute Redis Success")
 
-        # Redis key 构造
-        redis_key = '_'.join([seller_platform, seller, scene])
-
-        # 查询Redis
-        item = self.redis.get(redis_key)
+        item = self.get_dist_from_redis(seller_platform, seller, scene)
+        logging.debug('Redis Distribut:%s',item)
 
         if not item:
-            redis_key = '_'.join([seller_platform, seller, 'default'])
-            item = self.redis.get(redis_key)
-
-        if not item:
-            redis_key = '_'.join(['default', 'default', 'default'])
-            item = self.redis.get(redis_key)
+            item = self.db.get(
+                "SELECT * FROM `pass_code_config` WHERE seller_platform='default' AND seller='dafault' AND scene='default' LIMIT 1",
+                seller_platform, seller
+            )
 
         if item:
             dama_platform = item['dama_platform']
@@ -158,35 +154,69 @@ class AutoHandler(BaseHandler):
         logging.info('[%s,%s,%s] Distribute ===> %s,%s', seller_platform, seller, scene, dama_platform, self.distribute_code)
         return dama_platform
 
+    def get_dist_from_redis(self, seller_platform, seller, scene):
+        redis_key = '_'.join([seller_platform, seller])
+        item = self.redis.get(redis_key)
+        if not item:
+            return False
 
-    def refresh_redis(self):
+        item = cjson.decode(item)
+
+        if item.has_key(scene):
+            item = item.get(scene)
+        else:
+            item = item.get('default', False)
+
+        return item
+
+    def check_redis(self):
         # 三分钟前的时间
         now = datetime.datetime.now()
 
         # 比较是否要更新时间
         redis_config_key = 'pass_code_config_redis_cache_key'
-
         last_update_time = self.redis.get(redis_config_key)
-        delta = datetime.timedelta(minutes = 3)
-        last_update_time = last_update_time + delta
-
-        # 还未过期
-        if last_update_time < now:
-            return False
+        if last_update_time:
+            last_update_time_1 = datetime.datetime.strptime(last_update_time,'%Y-%m-%d %H:%M:%S')
+            diff = (now-last_update_time_1).seconds
+            logging.debug('In Refresh:old:%s,now:%s', last_update_time, now)
+            # 还未过期
+            if diff < 180:
+                return False
 
         # 已过期，需要重新更新redis
         items = self.db.query(
             "SELECT * FROM `pass_code_config`"
         )
+        logging.debug('check_redis=001=>%s', datetime.datetime.now()-now)
+        content = {}
         for it in items:
-            redis_key = '_'.join[it['seller_platform'], it['seller'], it['scene']]
-            self.redis.set(redis_key, it['dama_platform'])
-            self.redis.expire(redis_key, 60*3)
-
+            redis_key = '_'.join([it['seller_platform'], it['seller']])
+            if not content.has_key(redis_key):
+                content[redis_key] = {}
+            content[redis_key][it['scene']] = {
+                'dama_platform': it['dama_platform'],
+                'token': it['token']
+            }
+        logging.debug('check_redis=002=>%s', datetime.datetime.now()-now)
+        now = datetime.datetime.now()
+        for k,v in content.items():
+            self.redis.set(k, cjson.encode(v))
+            self.redis.expire(k, 60*3)
+        logging.debug('check_redis=003=>%s', datetime.datetime.now()-now)
+        now = datetime.datetime.now()
         # 更新标志位
-        self.redis.set(redis_config_key, datetime.datetime.now())
+        self.redis.set(redis_config_key, str(datetime.datetime.now())[:19])
+        self.redis.expire(redis_config_key, 60*3)
+        logging.debug('check_redis=004=>%s', datetime.datetime.now()-now)
 
         return True
+
+    def refresh_redis(self):
+        redis_config_key = 'pass_code_config_redis_cache_key'
+        self.redis.set(redis_config_key, None)
+        self.redis.expire(redis_config_key, 1)
+
 
 
 

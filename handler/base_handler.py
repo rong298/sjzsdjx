@@ -45,6 +45,9 @@ class BaseHandler(tornado.web.RequestHandler):
     def config(self):
         return self.application.config
 
+    @property
+    def dp_config(self):
+        return self.application.dp_config
 
     def get(self):
         self._do_get()
@@ -63,6 +66,7 @@ class BaseHandler(tornado.web.RequestHandler):
         默认的post操作
         若有特殊需求，则子类自行实现
         '''
+
         params = self.get_argument('params', strip=True, default=None)
         if params:
             try:

@@ -52,14 +52,11 @@ class Application(tornado.web.Application):
         # 打码查询接口路由
         handlers.append((r"/dama[/]?", AutoHandler))
 
-        root_abspath = os.path.dirname(
-                os.path.abspath(sys.argv[0]))
+        root_abspath = os.path.dirname(os.path.abspath(sys.argv[0]))
         web_root = os.path.dirname(__file__)
 
-        config = ConfigObj(root_abspath + '/config/config_online.ini',
-                encoding='UTF8')
-
-        logging.debug(config)
+        config = ConfigObj(root_abspath + '/config/config_online.ini', encoding='UTF8')
+        dama_platform_config = ConfigObj(root_abspath + '/config/dama_platform.ini', encoding='UTF8')
 
         settings = dict(
             root_path = os.path.join(web_root),
@@ -84,6 +81,7 @@ class Application(tornado.web.Application):
 
         self.query_id = MD5.random_md5()
         self.config = config
+        self.dp_config = dama_platform_config
 
         self.proxies = {}
         if options.proxies:
