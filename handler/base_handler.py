@@ -143,7 +143,7 @@ class BaseHandler(tornado.web.RequestHandler):
         myMd5_Digest = myMd5.hexdigest()
         return myMd5_Digest
 
-    def check_login(self):
+    def get_current_user(self):
         user_name = self.get_cookie('user_name')
         work_code = self.get_cookie('token')
         logging.debug('[%s][%s]check login ...', user_name, work_code)

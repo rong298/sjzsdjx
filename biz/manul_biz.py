@@ -29,10 +29,10 @@ class ManulBusiness(BaseBusiness):
         self.seller_platform= params.get('seller_platform')
 
         # 校验旧文件
-        result = self.check_old_image(image_search_key)
-        if result:
-            logging.debug('[%s][%s]CacheResult:%s', self._PLATFORM_CODE, image_search_key, result)
-            return self.parse_result(result)
+        #result = self.check_old_image(image_search_key)
+        #if result:
+        #    logging.debug('[%s][%s]CacheResult:%s', self._PLATFORM_CODE, image_search_key, result)
+        #    return self.parse_result(result)
 
         # 创造新文件
         result = self.create_new_image(image_search_key)

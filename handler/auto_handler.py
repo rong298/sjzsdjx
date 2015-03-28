@@ -65,7 +65,8 @@ class AutoHandler(BaseHandler):
         start_time = datetime.datetime.now()
         record_id = process_biz.query_record(dama_platform, seller_platform, seller, self.request.remote_ip, start_time, order_id, scene)
         if not record_id:
-            logging.error('[%s][%s]RecordFail...',dama_platform, record_id)
+            logging.error('RecordFail...[%s][%s][%s][%s][%s][%s][%s][%s]',
+                          dama_platform, seller_platform, seller, self.request.remote_ip, start_time, order_id, scene, record_id)
             self._fail_out(10002)
             return
 
@@ -142,6 +143,7 @@ class AutoHandler(BaseHandler):
             item = self.db.get(
                 "SELECT * FROM `pass_code_config` WHERE seller_platform='default' AND seller='dafault' AND scene='default' LIMIT 1"
             )
+            logging.warning('[%s][%s][%s]Use Mysql Default Config', seller_platform, seller, scene)
 
         if item:
             dama_platform = item['dama_platform']
@@ -149,6 +151,7 @@ class AutoHandler(BaseHandler):
         else:
             dama_platform = self.config['default']['dama_platform']
             self.distribute_code = self.config['default']['dama_token']
+            logging.warning('[%s][%s][%s]Use File Default Config', seller_platform, seller, scene)
 
         logging.info('[%s,%s,%s] Distribute ===> %s,%s', seller_platform, seller, scene, dama_platform, self.distribute_code)
         return dama_platform

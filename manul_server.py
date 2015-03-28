@@ -51,6 +51,7 @@ class Application(tornado.web.Application):
         # 手工打码输入界面路由
         handlers.append((r"/manul_dama/login[/]?", ManulLoginHandler))
         handlers.append((r"/manul_dama/login_process[/]?", ManulLoginProcessHandler))
+        handlers.append((r"/manul_dama/logout[/]?", ManulLogOutHandler))
         handlers.append((r"/manul_dama/search[/]?", ManulSearchHandler))
         handlers.append((r"/manul_dama/input[/]?", ManulInputHandler))
 
@@ -72,7 +73,7 @@ class Application(tornado.web.Application):
             ui_modules={},
             xsrf_cookies=False, #True,
             cookie_secret="9OWWEaJVQ3m0WOHDLJbX7+XKm8TCmUuki6BEE7RVur4=",
-            login_url="/dama"
+            login_url="/manul_dama/login"
         )
 
         logging.debug(settings)

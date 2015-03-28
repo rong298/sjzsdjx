@@ -45,13 +45,17 @@ class ManulLoginProcessHandler(BaseHandler):
             self.redirect('/manul_dama/search')
         return
 
+class ManulLogOutHandler(BaseHandler):
+    def get(self):
+        self.clear_cookie('user_name')
+        self.clear_cookie('token')
+        self.redirect('/manul_dama/login')
+
+        return
+
 class ManulSearchHandler(BaseHandler):
 
     def get(self):
-        if not self.check_login():
-            self.redirect('/manul_dama/login')
-            return
-
         # 设置过滤器
         filter = self.filter_config()
         if not filter:
@@ -93,61 +97,48 @@ class ManulSearchHandler(BaseHandler):
                         navi=u"")
 
     def filter_config(self):
-        tokens = self.db.query("SELECT `token` FROM `pass_code_config`")
-        tt = []
-        for t in tokens:
-            tt.append(t['token'])
-        if len(tt) == 0:
+        src_codes = self.get_cookie('token')
+        try:
+            codes = base64.b64decode(src_codes)
+        except:
+            logging.error('Token cannot decode:%s', src_codes)
             return False
-
-        codes = self.get_cookie('token')
-
-        if codes:
-            try:
-                codes = base64.b64decode(codes)
-            except:
-                return False
-            if codes.lower() != 'all':
-                tt = codes.split(",")
-
+        tt = []
+        if codes.lower() == 'all':
+            tokens = self.db.query("SELECT `token` FROM `pass_code_config`")
+            for t in tokens:
+                tt.append(t['token'])
+        else:
+            tt = codes.split(",")
         return tt
-
 
     def do_filter(self, filter, items):
         if not filter:
             return items
-
         new_items = []
         for it in items:
             if it['dis_code'] in filter:
                 new_items.append(it)
-
         return new_items
-
 
     def total(self, filter):
         user_name = self.get_cookie('user_name')
-        items = self.db.query("SELECT * FROM `pass_code` WHERE status=1")
         if not filter:
-            total = len(items)
+            items = self.db.get("SELECT count(1) as co FROM `pass_code` WHERE status=1")
+            total = items['co']
         else:
-            num = 0
-            for it in items:
-                if it['dis_code'] in filter:
-                    num = num + 1
-
-            total = num
+            dis_code = "','".join(filter)
+            dis_code = "'" + dis_code + "'"
+            items = self.db.get("SELECT count(1) as co FROM `pass_code` WHERE status=1 and dis_code in (%s)", dis_code)
+            total = items['co']
         logging.debug('[%s]Searching...%s', user_name, total)
-
         return total
-
 
     def search_in_checked(self, user_name):
         items = self.db.query(
             "SELECT * FROM `pass_code` WHERE status=2 AND `operator` in (%s, '') ORDER BY `created` ASC",
             user_name
         )
-
         items = self.do_filter(self.filter, items)
         if not items:
             return False
@@ -173,10 +164,6 @@ class ManulSearchHandler(BaseHandler):
 class ManulInputHandler(BaseHandler):
 
     def post(self):
-        if not self.check_login():
-            self.redirect('/manul_dama/login')
-            return
-
         value = self.get_argument('passvalue1', default=None)
         search_key = self.get_argument('search_key', default=None)
         user_name = self.get_cookie('user_name')
