@@ -24,6 +24,37 @@ from configobj import ConfigObj
 
 class BaseHandler(tornado.web.RequestHandler):
 
+    status_dict = {
+        '1' : u'成功',
+        '2' : u'打码平台服务器异常',
+        '3' : u'打码平台返回数据异常',
+        '4' : u'打码平台数据胡填',
+        '5' : u'前端验证错误',
+    }
+
+    scene_dict = {
+        'login_for_book' : '订座登录',
+        'check_order_info' : '下单',
+        'login_for_pay' : '支付登录',
+        'login_for_issue' : '回贴登录',
+        'login_for_autopay' : '自动支付',
+        'found_ticket' : '票号找回',
+        'passengers_query' : '身份核验',
+        'login_auto_resign' : '自动改签登录',
+        'check_order_auto_resign' : '自动改签下单'
+    }
+
+    seller_dict = {
+        'yh' : '云虎',
+        'dh' : '渡航'
+    }
+
+    seller_platform_dict = {
+        'qn' : '去哪儿',
+        'tb' : '淘宝',
+        'tc' : '同程'
+    }
+
     @property
     def db(self):
         return self.application.db
@@ -163,3 +194,6 @@ class BaseHandler(tornado.web.RequestHandler):
             image = image_content
 
         return image
+
+    def init(self):
+        self.render_set('status_dict', self.status_dict)

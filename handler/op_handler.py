@@ -29,13 +29,43 @@ class OpPlatformViewHandler(BaseHandler):
     '''
 
     def _do_get(self):
+        self.init()
+        # 错误统计数据来源
         config = self.config
         op_config = config['op']
         monitor_term = op_config['monitor_term']
         op_biz = OpBusiness(db=self.db)
+
+        # 获取数据
         monitor_data = op_biz.normal_monitor(monitor_term)
 
-    pass
+        ratio = {}
+        for it in monitor_data:
+            da = it['dama_platform']
+            status = int(it['status'])
+            count = it['count']
+            if not ratio.has_key(da):
+                ratio[da] = {'succ': 0, 'fail': 0}
+
+            if status == 1:
+                ratio[da]['succ'] = count
+            else:
+                ratio[da]['fail'] += count
+
+        logging.debug('[OP][NormalMonitor]%s', monitor_data)
+
+        # 当前打码平台配置
+        platforms = op_biz.get_all_platform()
+
+        self.render(
+            'platform_view.html',
+            items = monitor_data,
+            monitor_term = monitor_term,
+            ratio = ratio,
+            #status_dict = self.status_dict,
+            platforms = platforms
+        )
+
 
 class OpPlatformChangeHandler(BaseHandler):
     '''

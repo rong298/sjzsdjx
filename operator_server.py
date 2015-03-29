@@ -76,7 +76,7 @@ class Application(tornado.web.Application):
             root_abspath = root_abspath,
             template_path=os.path.join(web_root, "templates"),
             static_path=os.path.join(web_root, "static"),
-            ui_modules={},
+            ui_modules={"Entry":},
             xsrf_cookies=False, #True,
             cookie_secret="9OWWEaJVQ3m0WOHDLJbX7+XKm8TCmUuki6BEE7RVur4=",
             login_url="/dama"
