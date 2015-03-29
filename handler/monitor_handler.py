@@ -4,10 +4,19 @@ __author__ = 'Jacky'
 
 from handler.base_handler import BaseHandler
 from biz.monitor_biz import MonitorBusiness
+import datetime
+import logging
+import time
 
 class MonitorErrorHandler(BaseHandler):
 
     def _do_get(self):
+        if datetime.datetime.now().time() < datetime.time(
+                    7, 0, 0) or datetime.datetime.now().time() > datetime.time(23, 0, 0):
+            logging.info(">>> 12306 under maintenance.")
+            self.write("OK")
+            time.sleep(60)
+            return
 
         config = self.config
         op_config = config['monitor']
@@ -28,6 +37,13 @@ class MonitorErrorHandler(BaseHandler):
 class MonitorTimeOutHandler(BaseHandler):
 
     def _do_get(self):
+        if datetime.datetime.now().time() < datetime.time(
+                    7, 0, 0) or datetime.datetime.now().time() > datetime.time(23, 0, 0):
+            logging.info(">>> 12306 under maintenance.")
+            self.write("OK")
+            time.sleep(60)
+            return
+
         config = self.config
         op_config = config['monitor']
         monitor_term = op_config['monitor_term']
