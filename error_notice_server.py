@@ -45,8 +45,9 @@ CONFIG_PATH = ABSPATH + '/config'
 
 class RuoKuai(object):
 
-    def __init__(self):
-        self.config = ConfigObj(CONFIG_PATH + '/' + _PLATFORM_RUOKUAI + '.ini', encoding='UTF8')
+    def __init__(self, seller='yh'):
+        config = ConfigObj(CONFIG_PATH + '/dama_platform.ini', encoding='UTF8')
+        self.config = config[_PLATFORM_RUOKUAI][seller]
 
     def notice(self, query_id):
         ruokuai = self.config
@@ -66,8 +67,9 @@ class RuoKuai(object):
 
 class YunSu(object):
 
-    def __init__(self):
-        self.config = ConfigObj(CONFIG_PATH + '/' + _PLATFORM_YUNSU + '.ini', encoding='UTF8')
+    def __init__(self, seller='yh'):
+        config = ConfigObj(CONFIG_PATH + '/dama_platform.ini', encoding='UTF8')
+        self.config = config[_PLATFORM_YUNSU][seller]
 
     def notice(self, query_id):
         ruokuai = self.config
@@ -87,8 +89,9 @@ class YunSu(object):
 
 
 class Dama2(object):
-    def __init__(self):
-        self.config = ConfigObj(CONFIG_PATH + '/' + _PLATFORM_DAMA2 + '.ini', encoding='UTF8')
+    def __init__(self, seller='yh'):
+        config = ConfigObj(CONFIG_PATH + '/dama_platform.ini', encoding='UTF8')
+        self.config = config[_PLATFORM_DAMA2][seller]
 
     def notice(self, query_id):
         logging.info('Notice ===[dama2]===,query_id:%s', query_id)
@@ -101,8 +104,9 @@ class Dama2(object):
         return False
 
 class YunDama(object):
-    def __init__(self):
-        self.config = ConfigObj(CONFIG_PATH + '/' + _PLATFORM_YUNDAMA+ '.ini', encoding='UTF8')
+    def __init__(self, seller='yh'):
+        config = ConfigObj(CONFIG_PATH + '/dama_platform.ini', encoding='UTF8')
+        self.config = config[_PLATFORM_YUNDAMA][seller]
 
     def notice(self, query_id):
         config = self.config
@@ -152,18 +156,19 @@ class ErrorNotice(object):
     def notice(self, error):
         platform = error['dama_platform']
         query_id = error['dama_token_key']
+        seller = error['seller']
 
         try:
             if platform == _PLATFORM_DAMA2:
-                flag = Dama2().notice(query_id=query_id)
+                flag = Dama2(seller).notice(query_id=query_id)
             elif platform == _PLATFORM_MANUL:
                 flag = self.notice_manul(query_id=query_id)
             elif platform == _PLATFORM_RUOKUAI:
-                flag = RuoKuai().notice(query_id=query_id)
+                flag = RuoKuai(seller).notice(query_id=query_id)
             elif platform == _PLATFORM_QN:
                 flag = self.notice_qn(query_id)
             elif platform == _PLATFORM_YUNDAMA:
-                flag = YunDama().notice(query_id)
+                flag = YunDama(seller).notice(query_id)
             else:
                 flag = False
         except:
