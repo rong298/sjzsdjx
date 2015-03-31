@@ -195,5 +195,3 @@ class BaseHandler(tornado.web.RequestHandler):
 
         return image
 
-    def init(self):
-        self.render_set('status_dict', self.status_dict)

@@ -54,6 +54,7 @@ class Application(tornado.web.Application):
         handlers.append((r"/op/login_process[/]?", OpLoginProcessHandler))
 
         handlers.append((r"/op/platform_view[/]?", OpPlatformViewHandler))
+        handlers.append((r"/op/normal_monitor[/]?", OpRunningMonitorHandler))
         handlers.append((r"/op/platform_change[/]?", OpPlatformChangeHandler))
 
         handlers.append((r"/op/monitor[/]?", OpMonitorHandler))

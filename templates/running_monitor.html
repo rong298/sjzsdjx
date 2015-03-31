@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="page-content">
+						<!-- #section:settings.box -->
+	<div class="ace-settings-container" id="ace-settings-container">
+		<div class="btn btn-app btn-xs btn-warning ace-settings-btn" id="ace-settings-btn">
+			<i class="ace-icon fa fa-cog bigger-130"></i>
+		</div>
+
+		<div class="ace-settings-box clearfix" id="ace-settings-box">
+			<div class="pull-left width-50">
+				<!-- #section:settings.skins -->
+				<div class="ace-settings-item">
+					<div class="pull-left">
+						<select id="skin-colorpicker" class="hide">
+							<option data-skin="no-skin" value="#438EB9">#438EB9</option>
+							<option data-skin="skin-1" value="#222A2D">#222A2D</option>
+							<option data-skin="skin-2" value="#C6487E">#C6487E</option>
+							<option data-skin="skin-3" value="#D0D0D0">#D0D0D0</option>
+						</select>
+					</div>
+					<span>&nbsp; Choose Skin</span>
+				</div>
+
+				<!-- /section:settings.skins -->
+
+				<!-- #section:settings.navbar -->
+				<div class="ace-settings-item">
+					<input type="checkbox" class="ace ace-checkbox-2" id="ace-settings-navbar" />
+					<label class="lbl" for="ace-settings-navbar"> Fixed Navbar</label>
+				</div>
+
+				<!-- /section:settings.navbar -->
+
+				<!-- #section:settings.sidebar -->
+				<div class="ace-settings-item">
+					<input type="checkbox" class="ace ace-checkbox-2" id="ace-settings-sidebar" />
+					<label class="lbl" for="ace-settings-sidebar"> Fixed Sidebar</label>
+				</div>
+
+				<!-- /section:settings.sidebar -->
+
+				<!-- #section:settings.breadcrumbs -->
+				<div class="ace-settings-item">
+					<input type="checkbox" class="ace ace-checkbox-2" id="ace-settings-breadcrumbs" />
+					<label class="lbl" for="ace-settings-breadcrumbs"> Fixed Breadcrumbs</label>
+				</div>
+
+				<!-- /section:settings.breadcrumbs -->
+
+				<!-- #section:settings.rtl -->
+				<div class="ace-settings-item">
+					<input type="checkbox" class="ace ace-checkbox-2" id="ace-settings-rtl" />
+					<label class="lbl" for="ace-settings-rtl"> Right To Left (rtl)</label>
+				</div>
+
+				<!-- /section:settings.rtl -->
+
+				<!-- #section:settings.container -->
+				<div class="ace-settings-item">
+					<input type="checkbox" class="ace ace-checkbox-2" id="ace-settings-add-container" />
+					<label class="lbl" for="ace-settings-add-container">
+						Inside
+						<b>.container</b>
+					</label>
+				</div>
+
+				<!-- /section:settings.container -->
+			</div><!-- /.pull-left -->
+
+			<div class="pull-left width-50">
+				<!-- #section:basics/sidebar.options -->
+				<div class="ace-settings-item">
+					<input type="checkbox" class="ace ace-checkbox-2" id="ace-settings-hover" />
+					<label class="lbl" for="ace-settings-hover"> Submenu on Hover</label>
+				</div>
+
+				<div class="ace-settings-item">
+					<input type="checkbox" class="ace ace-checkbox-2" id="ace-settings-compact" />
+					<label class="lbl" for="ace-settings-compact"> Compact Sidebar</label>
+				</div>
+
+				<div class="ace-settings-item">
+					<input type="checkbox" class="ace ace-checkbox-2" id="ace-settings-highlight" />
+					<label class="lbl" for="ace-settings-highlight"> Alt. Active Item</label>
+				</div>
+
+				<!-- /section:basics/sidebar.options -->
+			</div><!-- /.pull-left -->
+		</div><!-- /.ace-settings-box -->
+	</div><!-- /.ace-settings-container -->
+
+	<!-- /section:settings.box -->
+	<div class="page-header">
+		<h1>
+			打码平台
+			<small>
+				<i class="ace-icon fa fa-angle-double-right"></i>
+			    运行状态监控({{ monitor_term }} 分钟)
+			</small>
+		</h1>
+	</div><!-- /.page-header -->
+
+	<div class="row">
+		<div class="col-xs-12">
+			<!-- PAGE CONTENT BEGINS -->
+			<div class="row">
+			    <div class="form-group">
+				    <div class="col-xs-12">
+					<table id="simple-table" class="table table-striped table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>打码平台编码</th>
+								<th>状态</th>
+								<th class="hidden-480">请求数量</th>
+								<th>平均执行时间(s)</th>
+							</tr>
+						</thead>
+
+						<tbody>
+						    {% for it in items %}
+							<tr>
+								<td>
+									<a href="#">{{ it['dama_platform'] }}</a>
+								</td>
+								<td>{{ status_dict.get(str(it['status']), it['status']) }}</td>
+								<td>{{ it['count'] }}</td>
+								{% if float(it['spendtime']) > 40 %}
+								<td class="hidden-480">
+								    <span class="label label-sm label-danger">{{ it['spendtime'] }}</span>
+								</td>
+								{% elif float(it['spendtime']) > 20 %}
+								<td class="hidden-480">
+								    <span class="label label-sm label-warning">{{ it['spendtime'] }}</span>
+								</td>
+								{% else %}
+								<td class="hidden-480">
+								    <span class="label label-sm label-success">{{ it['spendtime'] }}</span>
+								</td>
+								{% end %}
+							</tr>
+							{% end %}
+						</tbody>
+					</table>
+				</div>
+			</div><!-- /.span -->
+
+			    <div class="form-group">
+				    <div class="col-xs-12">
+					<table id="simple-table" class="table table-striped table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>打码平台编码</th>
+								<th>成功率</th>
+							</tr>
+						</thead>
+
+						<tbody>
+						    {% for it in ratio %}
+							<tr>
+								<td>
+									<a href="#">{{ it}}</a>
+								</td>
+								{% if float(ratio[it]['succ'])/float(ratio[it]['succ']+ratio[it]['fail']) < 0.4 %}
+								<td class="hidden-480">
+								    <span class="label label-sm label-warning">{{float(ratio[it]['succ'])/float(ratio[it]['succ']+ratio[it]['fail'])}}</span>
+								</td>
+								{% elif float(ratio[it]['succ'])/float(ratio[it]['succ']+ratio[it]['fail']) < 0.8 %}
+								<td class="hidden-480">
+								    <span class="label label-sm label-danger">{{float(ratio[it]['succ'])/float(ratio[it]['succ']+ratio[it]['fail'])}}</span>
+								</td>
+								{% else %}
+								<td class="hidden-480">
+								    <span class="label label-sm label-success">{{float(ratio[it]['succ'])/float(ratio[it]['succ']+ratio[it]['fail'])}}</span>
+								</td>
+								{% end %}
+							</tr>
+							{% end %}
+						</tbody>
+					</table>
+				</div>
+			</div><!-- /.span -->
+		    </div><!-- /.row -->
+			<!-- PAGE CONTENT ENDS -->
+		</div><!-- /.col -->
+	</div><!-- /.row -->
+</div><!-- /.page-content -->
+{% end %}

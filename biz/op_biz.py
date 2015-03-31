@@ -20,4 +20,31 @@ class OpBusiness(BaseBusiness):
 
         return res
 
+    def change_platform(self, seller_platform, seller, scene, dama_platform):
+
+        seller_platform = "','".join(seller_platform)
+        seller_platform = "'" + seller_platform + "'"
+
+        seller = "','".join(seller)
+        seller = "'" + seller+ "'"
+
+        scene = "','".join(scene)
+        scene = "'" + scene + "'"
+
+        sql = "UPDATE `pass_code_config` SET dama_platform='%s' WHERE seller_platform in (%s) AND seller in (%s) AND scene in (%s)" % \
+              (dama_platform, seller_platform, seller, scene)
+
+        logging.debug('[Change Platform]%s',sql)
+        affect = self.db.execute_rowcount(sql)
+
+        if affect:
+            logging.info('[ChangePlatform]Success,%s,%s,%s', seller_platform, seller, scene, dama_platform)
+            return True
+        else:
+            logging.error('[ChangePlatform]Fail,%s,%s,%s', seller_platform, seller, scene, dama_platform)
+            return False
+
+
+
+
 
