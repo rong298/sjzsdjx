@@ -38,10 +38,10 @@ class OpBusiness(BaseBusiness):
         affect = self.db.execute_rowcount(sql)
 
         if affect:
-            logging.info('[ChangePlatform]Success,%s,%s,%s', seller_platform, seller, scene, dama_platform)
+            logging.info('[ChangePlatform]Success,%s,%s,%s,%s', seller_platform, seller, scene, dama_platform)
             return True
         else:
-            logging.error('[ChangePlatform]Fail,%s,%s,%s', seller_platform, seller, scene, dama_platform)
+            logging.error('[ChangePlatform]Fail,%s,%s,%s,%s', seller_platform, seller, scene, dama_platform)
             return False
 
 
