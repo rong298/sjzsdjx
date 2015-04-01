@@ -98,6 +98,7 @@ class Dama2(object):
         url = 'http://115.28.233.13/report.php'
         post_data = {'id': query_id}
         response = requests.post(url=url, data=post_data)
+        logging.info('Notice ===[dama2]===,response:%s', response.text)
         result = response.json()
         if result.has_key('ret') and result['ret'] == '0':
             return True
