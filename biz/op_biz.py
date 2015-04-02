@@ -44,6 +44,12 @@ class OpBusiness(BaseBusiness):
             logging.error('[ChangePlatform]Fail,%s,%s,%s,%s', seller_platform, seller, scene, dama_platform)
             return False
 
+    # 财务信息
+    def get_balance(self):
+        pass
+
+
+
 
 
 

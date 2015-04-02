@@ -55,3 +55,10 @@ class RClient(object):
                           data=params, headers=self.headers, timeout=3)
         #logging.info('ruokuai-response:%s', r.text)
         return r.json()
+
+    def rk_info(self):
+        params = self.base_params
+        r = requests.post('http://api.ruokuai.com/info.json',
+                          data=params, headers=self.headers, timeout=3)
+        #logging.info('ruokuai-response:%s', r.text)
+        return r.json()

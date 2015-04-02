@@ -164,11 +164,11 @@
 								</td>
 								{% if float(ratio[it]['succ'])/float(ratio[it]['succ']+ratio[it]['fail']) < 0.4 %}
 								<td class="hidden-480">
-								    <span class="label label-sm label-warning">{{float(ratio[it]['succ'])/float(ratio[it]['succ']+ratio[it]['fail'])}}</span>
+								    <span class="label label-sm label-danger">{{float(ratio[it]['succ'])/float(ratio[it]['succ']+ratio[it]['fail'])}}</span>
 								</td>
 								{% elif float(ratio[it]['succ'])/float(ratio[it]['succ']+ratio[it]['fail']) < 0.8 %}
 								<td class="hidden-480">
-								    <span class="label label-sm label-danger">{{float(ratio[it]['succ'])/float(ratio[it]['succ']+ratio[it]['fail'])}}</span>
+								    <span class="label label-sm label-warning">{{float(ratio[it]['succ'])/float(ratio[it]['succ']+ratio[it]['fail'])}}</span>
 								</td>
 								{% else %}
 								<td class="hidden-480">
