@@ -69,7 +69,7 @@ class BaseBusiness(object):
         myMd5_Digest = myMd5.hexdigest()
         return myMd5_Digest
 
-    def query_record(self, platform, seller_platform, seller, remote_ip, start_time, order_id, scene):
+    def query_record(self, platform, seller_platform, seller, remote_ip, start_time, order_id='no_order_id', scene='default'):
 
         record = {
                 'seller_platform': seller_platform,
