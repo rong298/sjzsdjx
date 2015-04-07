@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 __author__ = 'Jacky'
 
-from handler.base_handler import BaseHandler
+from handler.base_handler import OpBaseHandler
 from biz.base_biz import BaseBusiness
 from biz.op_biz import OpBusiness
 from biz.yundama_biz import YunDamaBusiness
 from biz.dama2_biz import Dama2Business
 from biz.ruokuai_biz import RuokuaiBusiness
 import cjson
-
+import tornado
 import logging
 
-class OpLoginHandler(BaseHandler):
+class OpLoginHandler(OpBaseHandler):
     '''
     控制平台登录
     '''
@@ -24,13 +24,13 @@ class OpLoginHandler(BaseHandler):
             )
         return
 
-class OpLogoutHandler(BaseHandler):
+class OpLogoutHandler(OpBaseHandler):
     def _do_get(self):
         self.clear_cookie('op_server_seller')
         self.redirect('/op/login')
         return
 
-class OpLoginProcessHandler(BaseHandler):
+class OpLoginProcessHandler(OpBaseHandler):
     '''
     控制平台登录,提交
     '''
@@ -56,11 +56,11 @@ class OpLoginProcessHandler(BaseHandler):
         self.redirect('/op/platform_view')
         return
 
-class OpPlatformViewHandler(BaseHandler):
+class OpPlatformViewHandler(OpBaseHandler):
     '''
     打码平台配置查看
     '''
-
+    @tornado.web.authenticated
     def _do_get(self):
         # 错误统计数据来源
         config = self.config
@@ -77,7 +77,7 @@ class OpPlatformViewHandler(BaseHandler):
         #balance = balance.get(seller)
 
         # 当前打码平台配置
-        platforms = op_biz.get_all_platform()
+        platforms = op_biz.get_all_platform(seller)
 
         self.render(
             'platform_view.html',
@@ -90,7 +90,7 @@ class OpPlatformViewHandler(BaseHandler):
             #balance = balance
         )
 
-class OpRunningMonitorHandler(BaseHandler):
+class OpRunningMonitorHandler(OpBaseHandler):
     status_dict = {
         '1' : u'成功',
         '2' : u'打码平台服务器异常',
@@ -99,6 +99,7 @@ class OpRunningMonitorHandler(BaseHandler):
         '5' : u'前端验证错误',
     }
 
+    @tornado.web.authenticated
     def _do_get(self):
         config = self.config
         op_config = config['op']
@@ -144,7 +145,7 @@ class OpRunningMonitorHandler(BaseHandler):
 
     pass
 
-class OpPlatformChangeHandler(BaseHandler):
+class OpPlatformChangeHandler(OpBaseHandler):
     '''
     打码平台配置修改
     '''
@@ -172,7 +173,7 @@ class OpPlatformChangeHandler(BaseHandler):
 
 
 
-class OpMonitorHandler(BaseHandler):
+class OpMonitorHandler(OpBaseHandler):
     '''
     打码平台监控页面
     '''
@@ -218,7 +219,7 @@ class OpMonitorHandler(BaseHandler):
         return
 
 
-class OpBalanceHandler(BaseHandler):
+class OpBalanceHandler(OpBaseHandler):
     '''
     财务信息
     '''

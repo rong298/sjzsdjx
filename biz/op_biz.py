@@ -14,8 +14,8 @@ class OpBusiness(BaseBusiness):
 
         return res
 
-    def get_all_platform(self):
-        sql = "select * from `pass_code_config` order by seller_platform,seller,scene"
+    def get_all_platform(self, seller):
+        sql = "select * from `pass_code_config` where seller='%s' order by seller_platform,seller,scene" % seller
         res = self.db.query(sql)
 
         return res

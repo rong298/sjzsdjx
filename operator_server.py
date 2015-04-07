@@ -83,7 +83,7 @@ class Application(tornado.web.Application):
             ui_modules={},
             xsrf_cookies=False, #True,
             cookie_secret="9OWWEaJVQ3m0WOHDLJbX7+XKm8TCmUuki6BEE7RVur4=",
-            login_url="/dama"
+            login_url="/op/login"
         )
 
         logging.debug(settings)

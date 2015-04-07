@@ -195,3 +195,10 @@ class BaseHandler(tornado.web.RequestHandler):
 
         return image
 
+
+class OpBaseHandler(BaseHandler):
+    def get_current_user(self):
+        op_server_seller = self.get_cookie('op_server_seller')
+        if not op_server_seller:
+            return False
+        return op_server_seller
