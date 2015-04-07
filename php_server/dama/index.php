@@ -32,7 +32,7 @@ error_log(date("[Y-m-d H:i:s]")." -[".$_SERVER['REQUEST_URI']."] : GET RESULT: "
 $result['id'] = $info['id'];
 echo json_encode($result);     
 */
-$cnt = 0
+$cnt = 0;
 while(1){
    $result = $dama_api->get_result($info['id']);
    error_log(date("[Y-m-d H:i:s]")." -[".$_SERVER['REQUEST_URI']."] : GET RESULT: ".json_encode($result)."\n", 3, $log_file);
@@ -45,6 +45,6 @@ while(1){
    else{
       sleep(1);
    }
-   $cnt += 1
+   $cnt += 1;
 }
 ?>
