@@ -53,6 +53,9 @@ class Application(tornado.web.Application):
         handlers.append((r"/op/login[/]?", OpLoginHandler))
         handlers.append((r"/op/login_process[/]?", OpLoginProcessHandler))
 
+        # TODO 后期要上升到整个页面的退出
+        handlers.append((r"/admin/logout[/]?", OpLogoutHandler))
+
         handlers.append((r"/op/platform_view[/]?", OpPlatformViewHandler))
         handlers.append((r"/op/normal_monitor[/]?", OpRunningMonitorHandler))
         handlers.append((r"/op/platform_change[/]?", OpPlatformChangeHandler))

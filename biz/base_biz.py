@@ -46,6 +46,10 @@ class BaseBusiness(object):
     REDIS_KEY_YUNDAMA = 'redis_key_yundama'
     REDIS_KEY_QUNARDAMA = 'redis_key_qunar_dama'
     REDIS_KEY_YUNSU = 'redis_key_yunsu'
+    REDIS_KEY_TOTAL = 'redis_key_pass_code'
+
+    MONITOR_LEVEL_1 = 20000
+    MONITOR_LEVEL_2 = 200000
 
 
     DAMA_LIST = [DAMA2, RUOKUAI, YUNDAMA, YUNSU]

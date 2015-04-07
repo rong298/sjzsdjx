@@ -78,4 +78,17 @@ class Dama2Business(BaseBusiness):
         return ret
 
     def account_detail(self):
-        pass
+        config = self.config
+
+        # 发送请求
+        try:
+            response = requests.post(config['adepter_url'])
+        except:
+            logging.error(traceback.format_exc())
+            return False
+        logging.debug('[%s]%s', self._PLATFORM_CODE, response.text)
+
+        # 解析结果
+        result = response.json()
+        return {'score': result['balance'], 'update_time': datetime.datetime.now()}
+

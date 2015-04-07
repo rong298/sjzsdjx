@@ -138,19 +138,19 @@
 					<!-- #section:custom/checkbox -->
 						<div class="checkbox">
 							<label>
-								<input name="seller" type="checkbox" class="ace" value="yh">
+								<input name="seller" type="checkbox" class="ace" value="yh" {% if seller != 'yh' %} disabled {% end %}>
 								<span class="lbl">YH</span>
 							</label>
 						</div>
 						<div class="checkbox">
 							<label>
-								<input name="seller" type="checkbox" class="ace" value="dh">
+								<input name="seller" type="checkbox" class="ace" value="dh" {% if seller != 'dh' %} disabled {% end %}>
 								<span class="lbl">DH</span>
 							</label>
 						</div>
 						<div class="checkbox">
 							<label>
-								<input name="seller" type="checkbox" class="ace" value="common">
+								<input name="seller" type="checkbox" class="ace" value="common" {% if seller != 'common' %} disabled {% end %}>
 								<span class="lbl">登陆保持(common)</span>
 							</label>
 						</div>
@@ -273,11 +273,21 @@
 				    <label class="control-label col-x-12 col-sm-3 no-padding-right" for="dama_platform">打码平台</label>
 					<div class="col-xs-12 col-sm-9">
 				        <select name="dama_platform" id="dama_platform" style="width: 200px;">
-				            <option value="ruokuai">若快</option>
-				            <option value="yunsu">云速</option>
-				            <option value="yundama">云打码</option>
-				            <option value="dama2">打码兔</option>
-				            <option value="qunar_dama">去哪儿</option>
+				            <option value="ruokuai">
+				            若快
+				            </option>
+				            <option value="yunsu">
+				            云速
+				            </option>
+				            <option value="yundama">
+				            云打码
+				            </option>
+				            <option value="dama2">
+				            打码兔
+				            </option>
+				            <option value="qunar_dama">
+				            去哪儿
+				            </option>
 			            </select>
 			        </div>
 			    </div>

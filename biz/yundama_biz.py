@@ -19,6 +19,7 @@ import random
 import logging
 import traceback
 import re
+import datetime
 
 from lib.api.yundama import YDMHttp
 from biz.base_biz import BaseBusiness
@@ -102,4 +103,20 @@ class YunDamaBusiness(BaseBusiness):
         return ret
 
     def account_detail(self):
-        pass
+        config = self.config
+        logging.debug('[%s]account:%s', self._PLATFORM_CODE, config)
+
+        try:
+            yun_dama = YDMHttp(
+                username = config['username'].encode("UTF-8"),
+                password = config['password'].encode("UTF-8"),
+                appid = config['appid'].encode("UTF-8"),
+                appkey = config['appkey'].encode("UTF-8")
+            )
+
+            yun_dama.login()
+            response = yun_dama.balance()
+        except:
+            logging.error(traceback.format_exc())
+
+        return {'score': response, 'update_time': datetime.datetime.now()}

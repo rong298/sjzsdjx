@@ -8,6 +8,7 @@ from biz.op_biz import OpBusiness
 from biz.yundama_biz import YunDamaBusiness
 from biz.dama2_biz import Dama2Business
 from biz.ruokuai_biz import RuokuaiBusiness
+import cjson
 
 import logging
 
@@ -15,13 +16,45 @@ class OpLoginHandler(BaseHandler):
     '''
     控制平台登录
     '''
-    pass
+    def _do_get(self):
+        errmsg = self.get_argument('errmsg', '')
+        self.render(
+            'op_login.html',
+            errmsg=errmsg
+            )
+        return
+
+class OpLogoutHandler(BaseHandler):
+    def _do_get(self):
+        self.clear_cookie('op_server_seller')
+        self.redirect('/op/login')
+        return
 
 class OpLoginProcessHandler(BaseHandler):
     '''
     控制平台登录,提交
     '''
-    pass
+    def _do_post(self):
+        username = self.get_argument('username')
+        password = self.get_argument('password')
+
+        if password != 'yur140608':
+            self.redirect('/op/login?errmsg=账号密码错误')
+            return
+
+        if username == 'yunhu':
+            seller = 'yh'
+        elif username == 'duhang':
+            seller = 'dh'
+        elif username == 'common':
+            seller = 'common'
+        else:
+            self.redirect('/op/login?errmsg=账号密码错误')
+            return
+
+        self.set_cookie('op_server_seller', seller)
+        self.redirect('/op/platform_view')
+        return
 
 class OpPlatformViewHandler(BaseHandler):
     '''
@@ -36,37 +69,25 @@ class OpPlatformViewHandler(BaseHandler):
         op_biz = OpBusiness(db=self.db)
         errmsg = self.get_argument('errmsg',None)
         flag = self.get_argument('flag',None)
+        seller = self.get_cookie('op_server_seller')
 
-        # 获取数据
-        monitor_data = op_biz.normal_monitor(monitor_term)
-
-        ratio = {}
-        for it in monitor_data:
-            da = it['dama_platform']
-            status = int(it['status'])
-            count = it['count']
-            if not ratio.has_key(da):
-                ratio[da] = {'succ': 0, 'fail': 0}
-
-            if status == 1:
-                ratio[da]['succ'] = count
-            else:
-                ratio[da]['fail'] += count
-
-        logging.debug('[OP][NormalMonitor]%s', monitor_data)
+        # 余额信息查询
+        #balance = self.redis.get(BaseBusiness.REDIS_KEY_TOTAL)
+        #balance = cjson.decode(balance)
+        #balance = balance.get(seller)
 
         # 当前打码平台配置
         platforms = op_biz.get_all_platform()
 
         self.render(
             'platform_view.html',
-            items = monitor_data,
-            monitor_term = monitor_term,
-            ratio = ratio,
             status_dict = self.status_dict,
             platforms = platforms,
             errmsg = errmsg,
-            flag = flag
+            flag = flag,
+            current_user = seller,
+            seller = seller
+            #balance = balance
         )
 
 class OpRunningMonitorHandler(BaseHandler):
@@ -83,9 +104,10 @@ class OpRunningMonitorHandler(BaseHandler):
         op_config = config['op']
         monitor_term = op_config['monitor_term']
         op_biz = OpBusiness(db=self.db)
+        seller = self.get_cookie('op_server_seller')
 
         # 获取数据
-        monitor_data = op_biz.normal_monitor(monitor_term)
+        monitor_data = op_biz.normal_monitor(seller=seller, term=monitor_term)
 
         ratio = {}
         for it in monitor_data:
@@ -100,15 +122,23 @@ class OpRunningMonitorHandler(BaseHandler):
             else:
                 ratio[da]['fail'] += count
 
-        # ToDo 余额信息查询
-
+        # 余额信息查询
+        balance = self.redis.get(BaseBusiness.REDIS_KEY_TOTAL)
+        if balance:
+            balance = cjson.decode(balance)
+            balance = balance.get(seller)
+        else:
+            balance = {}
 
         logging.debug('[OP][NormalMonitor]%s', monitor_data)
         self.render('running_monitor.html',
                     items = monitor_data,
                     monitor_term = monitor_term,
                     ratio = ratio,
-                    status_dict = self.status_dict
+                    status_dict = self.status_dict,
+                    balance = balance,
+                    current_user = seller,
+                    seller = seller
                     )
         return
 
