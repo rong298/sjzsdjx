@@ -30,10 +30,10 @@
  */
 require( dirname(__FILE__) . '/Dama2Encrypt.php');
 class Dama2Api{
-    const APP_KEY = '0b9c7e07a56c23d53bf9031c305e1fc3';//替换成你的app_key
-    const APP_ID = '36729';//替换你的app_id
+    #const APP_KEY = '0b9c7e07a56c23d53bf9031c305e1fc3';//替换成你的app_key
+    #const APP_ID = '36729';//替换你的app_id
     const HOST = 'http://api.dama2.com:7788';
-    private $prefix_sess = '_dama2_api_';
+    private $prefix_sess = '_dama2_api__';
     private $expire_time = 540;
     private $data;
     public $debug;
