@@ -40,6 +40,14 @@ class BaseBusiness(object):
     QUNARDAMA = 'qunar_dama'
     YUNSU = 'yunsu'
 
+    REDIS_KEY_MANUL = 'redis_key_manul'
+    REDIS_KEY_DAMA2 = 'redis_key_dama2'
+    REDIS_KEY_RUOKUAI = 'redis_key_ruokuai'
+    REDIS_KEY_YUNDAMA = 'redis_key_yundama'
+    REDIS_KEY_QUNARDAMA = 'redis_key_qunar_dama'
+    REDIS_KEY_YUNSU = 'redis_key_yunsu'
+
+
     DAMA_LIST = [DAMA2, RUOKUAI, YUNDAMA, YUNSU]
 
     def __init__(self, **kargs):

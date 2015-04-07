@@ -16,6 +16,7 @@
 # under the License.
 
 import random
+import datetime
 import logging
 import traceback
 import re
@@ -100,4 +101,20 @@ class RuokuaiBusiness(BaseBusiness):
         return ret
 
     def account_detail(self):
-        pass
+        config = self.config
+        logging.debug('[ruokuai]account_detail:%s', config)
+
+        # 调用接口，获取账号信息
+        rc = RClient(
+            config['account'],
+            config['password'],
+            config['code'],
+            config['token']
+        )
+        response = rc.rk_info()
+        logging.debug('Result:%s', response)
+
+        # 解析结果
+        score = response.get('Score', -1)
+        return {'score': score, 'update_time': datetime.datetime.now()}
+

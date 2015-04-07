@@ -19,6 +19,7 @@ import random
 import logging
 import traceback
 import re
+import datetime
 
 from lib.api.yunsu import YSlient
 from biz.base_biz import BaseBusiness
@@ -103,4 +104,19 @@ class YunsuBusiness(BaseBusiness):
         return ret
 
     def account_detail(self):
-        pass
+        config = self.config
+        logging.debug('[yunsu]account_detail:%s', config)
+
+        # 调用接口，获取账号信息
+        rc = YSlient(
+            config['account'],
+            config['password'],
+            config['code'],
+            config['token']
+        )
+        response = rc.ys_info()
+        logging.debug('Result:%s', response)
+
+        # 解析结果
+        score = response.get('Score', -1)
+        return {'score': score, 'update_time': datetime.datetime.now()}

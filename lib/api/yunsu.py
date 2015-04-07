@@ -55,3 +55,10 @@ class YSlient(object):
                           data=params, headers=self.headers, timeout=3)
         #logging.info('ruokuai-response:%s', r.text)
         return r.json()
+
+    def ys_info(self):
+        params = self.base_params
+        r = requests.post('http://api.ysdm.com/info.json',
+                          data=params, headers=self.headers, timeout=3)
+        logging.info('yunsu-response:%s', r.text)
+        return r.json()

@@ -177,6 +177,7 @@ class Dama2Api
      * @return array
      */
     public function get_balance(){
+        var_dump(1233333);
         return $this->http_request('/app/getBalance', array('auth' => $this->get_auth()));
     }
 
