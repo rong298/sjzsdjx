@@ -35,6 +35,7 @@ class Dama2Business(BaseBusiness):
 
         # 获取参数
         query_params = self.parse_params(image_content)
+        logging.debug('[%s]QueryParams:%s', self._PLATFORM_CODE, query_params)
 
         # 发送请求
         try:
