@@ -35,6 +35,7 @@ class AutoHandler(BaseHandler):
 
         # 从数据库中获取分发规则
         dama_platform = self.distribute_v2(seller_platform, seller, scene)
+        #dama_platform = 'dama2'
 
         # 缓存图片到Redis
         search_key = MD5.create(image)
@@ -176,7 +177,7 @@ class AutoHandler(BaseHandler):
         now = datetime.datetime.now()
 
         # 比较是否要更新时间
-        redis_config_key = 'pass_code_config_redis_cache_key'
+        redis_config_key = self.DISTRIBUTE_REDIS_KEY
         last_update_time = self.redis.get(redis_config_key)
         if last_update_time:
             last_update_time_1 = datetime.datetime.strptime(last_update_time,'%Y-%m-%d %H:%M:%S')
@@ -215,7 +216,7 @@ class AutoHandler(BaseHandler):
         return True
 
     def refresh_redis(self):
-        redis_config_key = 'pass_code_config_redis_cache_key'
+        redis_config_key = self.DISTRIBUTE_REDIS_KEY
         self.redis.set(redis_config_key, None)
         self.redis.expire(redis_config_key, 1)
 

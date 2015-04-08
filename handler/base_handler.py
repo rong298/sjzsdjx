@@ -55,6 +55,8 @@ class BaseHandler(tornado.web.RequestHandler):
         'tc' : '同程'
     }
 
+    DISTRIBUTE_REDIS_KEY = 'pass_code_config_redis_cache_key_temp'
+
     @property
     def db(self):
         return self.application.db
