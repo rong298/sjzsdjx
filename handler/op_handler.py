@@ -132,6 +132,7 @@ class OpRunningMonitorHandler(OpBaseHandler):
             balance = {}
 
         logging.debug('[OP][NormalMonitor]%s', monitor_data)
+        logging.info('[OP][Balance]%s', balance)
         self.render('running_monitor.html',
                     items = monitor_data,
                     monitor_term = monitor_term,
