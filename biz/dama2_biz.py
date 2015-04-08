@@ -38,7 +38,7 @@ class Dama2Business(BaseBusiness):
 
         # 发送请求
         try:
-            response = requests.post(config['adepter_url'], data=query_params)
+            response = requests.post(config['adepter_url']+'/index.php', data=query_params)
         except:
             logging.error(traceback.format_exc())
             self.error_record(record_id, 2)
@@ -53,10 +53,14 @@ class Dama2Business(BaseBusiness):
 
         return result
 
-    def parse_params(self, image_content, image_type=287):
+    def parse_params(self, image_content='', image_type=287):
         params = {
             'file_type': str(image_type),
-            'content': image_content
+            'content': image_content,
+            'username': self.config['account'],
+            'password': self.config['password'],
+            'app_key': self.config['token'],
+            'app_id': self.config['code']
         }
         return params
 
@@ -80,9 +84,12 @@ class Dama2Business(BaseBusiness):
     def account_detail(self):
         config = self.config
 
+        # 获取参数
+        query_params = self.parse_params()
+
         # 发送请求
         try:
-            response = requests.post(config['adepter_url'])
+            response = requests.post(config['adepter_url']+'/balance.php', data=query_params)
         except:
             logging.error(traceback.format_exc())
             return False

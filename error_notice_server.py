@@ -95,8 +95,14 @@ class Dama2(object):
 
     def notice(self, query_id):
         logging.info('Notice ===[dama2]===,query_id:%s', query_id)
-        url = 'http://115.28.233.13/report.php'
-        post_data = {'id': query_id}
+        url = self.config['adepter_url']+'/balance.php'
+        post_data = {
+            'id': query_id,
+            'username': self.config['account'],
+            'password': self.config['password'],
+            'app_key': self.config['token'],
+            'app_id': self.config['code']
+        }
         response = requests.post(url=url, data=post_data)
         logging.info('Notice ===[dama2]===,response:%s', response.text)
         result = response.json()

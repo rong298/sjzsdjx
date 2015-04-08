@@ -30,17 +30,20 @@
  */
 require( dirname(__FILE__) . '/Dama2Encrypt.php');
 class Dama2Api{
-    #const APP_KEY = '0b9c7e07a56c23d53bf9031c305e1fc3';//替换成你的app_key
-    #const APP_ID = '36729';//替换你的app_id
     const HOST = 'http://api.dama2.com:7788';
     private $prefix_sess = '_dama2_api__';
     private $expire_time = 540;
     private $data;
     public $debug;
 
-    public function __construct($username, $password){
+    public function __construct($username, $password, $app_key, $app_id, $redis_ip, $redis_port, $redis_auth='toptrain'){
         $this->username = $username;
         $this->password = $password;
+        $this->app_key = $app_key;
+        $this->app_id = $app_id;
+        $this->redis_ip = $redis_ip;
+        $this->redis_port = $redis_port;
+        $this->redis_auth = $redis_auth;
     }
 
     private function login(){
@@ -52,9 +55,9 @@ class Dama2Api{
             if($json['ret'] == 0){
                 $password = md5($this->password);
                 $encinfo = $json['auth'] . "\n" . $this->username . "\n" . $password ;
-                $encinfo = Dama2Encrypt::encrypt($encinfo, self::APP_KEY);
+                $encinfo = Dama2Encrypt::encrypt($encinfo, $this->app_key);
                 $this->get('/app/login', array(
-                    'appID' => self::APP_ID,
+                    'appID' => $this->app_id,
                     'encinfo' => $encinfo
                     ));
                 $res = @json_decode($this->getContent(), true);
@@ -71,8 +74,8 @@ class Dama2Api{
 
     private function set_auth($auth){
         $redis = new Redis();
-        $redis->connect('121.42.139.97', 6379); 
-        $redis->auth('toptrain'); 
+        $redis->connect($this->redis_ip, $this->redis_port);
+        $redis->auth($this->redis_auth);
 
         $redis->set($this->prefix_sess . 'name', $this->username);
         $redis->set($this->prefix_sess . 'password', $this->password);
@@ -82,8 +85,8 @@ class Dama2Api{
 
     private function is_auth_alive(){
         $redis = new Redis();
-        $redis->connect('121.42.139.97', 6379); 
-        $redis->auth('toptrain'); 
+        $redis->connect($this->redis_ip, $this->redis_port);
+        $redis->auth($this->redis_auth);
         
         $auth = $redis->get($this->prefix_sess . 'auth');
         $time = $redis->get($this->prefix_sess . 'time');
@@ -109,8 +112,8 @@ class Dama2Api{
         }
 
         $redis = new Redis();
-        $redis->connect('121.42.139.97', 6379); 
-        $redis->auth('toptrain'); 
+        $redis->connect($this->redis_ip, $this->redis_port);
+        $redis->auth($this->redis_auth);
 
         return $redis->get($this->prefix_sess . 'auth');
     }
@@ -216,15 +219,15 @@ class Dama2Api{
      * @param string 电话
      * @return array
      */
-    public static function register($username, $password, $email, $qq='', $tel=''){
+    public static function register($username, $password, $email, $app_key, $app_id, $qq='', $tel=''){
         if( $json = self::_get('/app/preauth')){
             $json = json_decode($json['data'], true);
             if($json['ret'] == 0){
                 $password = md5($password);
                 $encinfo = $json['auth'] . "\n" . $username . "\n" . $password ;
-                $encinfo = Dama2Encrypt::encrypt($encinfo, self::APP_KEY);
+                $encinfo = Dama2Encrypt::encrypt($encinfo, $app_key);
                 $res = self::_get('/app/register', array(
-                    'appID' => self::APP_ID,
+                    'appID' => $app_id,
                     'encinfo' => $encinfo,
                     'qq' => $qq,
                     'email' => $email,
