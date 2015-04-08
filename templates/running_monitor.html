@@ -124,13 +124,6 @@
 								<td>
 									<a href="#">
 									{{ it['dama_platform'] }}
-									{% if balance.has_key(it['dama_platform']) and int(balance[it['dama_platform']]['score']) < 20000  %}
-								    <span class="label label-sm label-danger">{{ balance[it['dama_platform']]['score'] }}</span>
-									{% elif balance.has_key(it['dama_platform']) and int(balance[it['dama_platform']]['score']) < 200000  %}
-								    <span class="label label-sm label-warning">{{ balance[it['dama_platform']]['score'] }}</span>
-									{% elif balance.has_key(it['dama_platform']) %}
-								    <span class="label label-sm label-success">{{ balance[it['dama_platform']]['score'] }}</span>
-								    {% end %}
 									</a>
 								</td>
 								<td>{{ status_dict.get(str(it['status']), it['status']) }}</td>
@@ -170,6 +163,14 @@
 							<tr>
 								<td>
 									<a href="#">{{ it}}</a>
+
+									{% if balance.has_key(it) and int(balance[it]['score']) < 20000  %}
+								    <span class="label label-sm label-danger">{{ balance[it]['score'] }}</span>
+									{% elif balance.has_key(it) and int(balance[it]['score']) < 200000  %}
+								    <span class="label label-sm label-warning">{{ balance[it]['score'] }}</span>
+									{% elif balance.has_key(it) %}
+								    <span class="label label-sm label-success">{{ balance[it]['score'] }}</span>
+								    {% end %}
 								</td>
 								{% if float(ratio[it]['succ'])/float(ratio[it]['succ']+ratio[it]['fail']) < 0.4 %}
 								<td class="hidden-480">
