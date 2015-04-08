@@ -120,7 +120,7 @@ def main():
     if method == 'db_backup':
         CrontabServer().db_backup()
     elif method == 'balance':
-        CrontabServer().balance()
+        CrontabServer().balance_start()
 
 if __name__ == '__main__':
     main()
