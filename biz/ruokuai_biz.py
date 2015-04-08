@@ -116,5 +116,5 @@ class RuokuaiBusiness(BaseBusiness):
 
         # 解析结果
         score = response.get('Score', -1)
-        return {'score': score, 'update_time': datetime.datetime.now()}
+        return {'score': score, 'update_time': str(datetime.datetime.now())}
 

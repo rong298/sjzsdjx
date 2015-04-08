@@ -119,4 +119,4 @@ class YunDamaBusiness(BaseBusiness):
         except:
             logging.error(traceback.format_exc())
 
-        return {'score': response, 'update_time': datetime.datetime.now()}
+        return {'score': response, 'update_time': str(datetime.datetime.now())}

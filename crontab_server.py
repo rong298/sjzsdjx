@@ -77,34 +77,30 @@ class CrontabServer(object):
             balance[seller] = {}
             # ruokuai
             config = self.config[BaseBusiness.RUOKUAI][seller]
-            redis_key = BaseBusiness.REDIS_KEY_RUOKUAI
             result = RuokuaiBusiness(db=self.db, config=config).account_detail()
             logging.info('[Ruokuai]Result:%s', result)
             balance[seller][BaseBusiness.RUOKUAI] = result
 
             # yunsu
             config = self.config[BaseBusiness.YUNSU][seller]
-            redis_key = BaseBusiness.REDIS_KEY_YUNSU
             result = YunsuBusiness(db=self.db, config=config).account_detail()
             logging.info('[Yunsu]Result:%s', result)
             balance[seller][BaseBusiness.YUNSU] = result
 
             # yundama
             config = self.config[BaseBusiness.YUNDAMA][seller]
-            redis_key = BaseBusiness.REDIS_KEY_YUNDAMA
             result = YunDamaBusiness(db=self.db, config=config).account_detail()
             logging.info('[Yunsu]Result:%s', result)
             balance[seller][BaseBusiness.YUNDAMA] = result
 
             # dama2
             config = self.config[BaseBusiness.DAMA2][seller]
-            redis_key = BaseBusiness.REDIS_KEY_DAMA2
             result = Dama2Business(db=self.db, config=config).account_detail()
             logging.info('[Yunsu]Result:%s', result)
             balance[seller][BaseBusiness.DAMA2] = result
 
 
-        self.redis.set(BaseBusiness.REDIS_KEY_TOTAL, balance)
+        self.redis.set(BaseBusiness.REDIS_KEY_TOTAL, cjson.encode(balance))
         self.redis.expire(BaseBusiness.REDIS_KEY_TOTAL, 60*5)
 
     def balance_start(self):

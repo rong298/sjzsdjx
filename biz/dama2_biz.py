@@ -98,5 +98,5 @@ class Dama2Business(BaseBusiness):
 
         # 解析结果
         result = response.json()
-        return {'score': result['balance'], 'update_time': datetime.datetime.now()}
+        return {'score': result['balance'], 'update_time': str(datetime.datetime.now())}
 
