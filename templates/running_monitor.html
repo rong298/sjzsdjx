@@ -124,12 +124,13 @@
 								<td>
 									<a href="#">
 									{{ it['dama_platform'] }}
-
 									{% if balance.has_key(it['dama_platform']) and int(balance[it['dama_platform']]) < BaseBusiness.MONITOR_LEVEL_1  %}
-									<span class="label label-sm label-danger">题分不足,立即下线</span>
+								    <span class="label label-sm label-danger">{{ it['spendtime'] }}</span>
 									{% elif balance.has_key(it['dama_platform']) and int(balance[it['dama_platform']]) < BaseBusiness.MONITOR_LEVEL_2  %}
-									<span class="label label-sm label-danger">题分紧张,尽快充值</span>
-									{% end %}
+								    <span class="label label-sm label-warning">{{ it['spendtime'] }}</span>
+									{% else %}
+								    <span class="label label-sm label-success">{{ it['spendtime'] }}</span>
+								    {% end %}
 									</a>
 								</td>
 								<td>{{ status_dict.get(str(it['status']), it['status']) }}</td>
