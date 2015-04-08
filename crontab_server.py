@@ -104,7 +104,7 @@ class CrontabServer(object):
             balance[seller][BaseBusiness.DAMA2] = result
 
 
-        self.redis.set(BaseBusiness.REDIS_KEY_TOTAL, cjson.encode(balance))
+        self.redis.set(BaseBusiness.REDIS_KEY_TOTAL, balance)
         self.redis.expire(BaseBusiness.REDIS_KEY_TOTAL, 60*5)
 
     def balance_start(self):

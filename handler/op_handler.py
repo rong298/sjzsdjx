@@ -126,7 +126,7 @@ class OpRunningMonitorHandler(OpBaseHandler):
         # 余额信息查询
         balance = self.redis.get(BaseBusiness.REDIS_KEY_TOTAL)
         if balance:
-            balance = cjson.decode(balance)
+            balance = cjson.encode(balance)
             balance = balance.get(seller)
         else:
             balance = {}
