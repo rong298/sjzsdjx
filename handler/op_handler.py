@@ -55,7 +55,9 @@ class OpLoginProcessHandler(OpBaseHandler):
             self.redirect('/op/login?errmsg=账号密码错误')
             return
 
-        self.set_cookie('op_server_seller', base64.b64encode(cjson.encode(seller)))
+        seller = '-'.join(seller)
+
+        self.set_cookie('op_server_seller', seller)
         self.redirect('/op/platform_view')
         return
 
@@ -72,7 +74,10 @@ class OpPlatformViewHandler(OpBaseHandler):
         op_biz = OpBusiness(db=self.db)
         errmsg = self.get_argument('errmsg',None)
         flag = self.get_argument('flag',None)
-        seller = cjson.decode(base64.b64decode(self.get_cookie('op_server_seller')))
+        seller = self.get_cookie('op_server_seller')
+        seller = seller.split('-')
+
+        logging.debug('[OpPlatformViewHandler]%s', seller)
 
         # 余额信息查询
         #balance = self.redis.get(BaseBusiness.REDIS_KEY_TOTAL)
@@ -108,8 +113,10 @@ class OpRunningMonitorHandler(OpBaseHandler):
         op_config = config['op']
         monitor_term = op_config['monitor_term']
         op_biz = OpBusiness(db=self.db)
-        seller = cjson.decode(base64.b64decode(self.get_cookie('op_server_seller')))
+        seller = self.get_cookie('op_server_seller')
+        seller = seller.split('-')
 
+        logging.debug('[OpRunningMonitorHandler]%s', seller)
         # 获取数据
         monitor_data = op_biz.normal_monitor(seller=seller, term=monitor_term)
 
