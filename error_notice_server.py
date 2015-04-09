@@ -200,7 +200,7 @@ class ErrorNotice(object):
             logging.info(u"%s scanning ... %s", '='*10, '='*10)
             # 获取错误列表
             errors = self.db.query(
-                "SELECT * FROM `pass_code_records` WHERE notice_status=1"
+                "SELECT * FROM `pass_code_records` WHERE created>=DATE_SUB(NOW(),INTERVAL 10 MINUTE) AND notice_status=1"
             )
 
 
