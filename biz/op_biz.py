@@ -8,14 +8,22 @@ import logging
 class OpBusiness(BaseBusiness):
 
     def normal_monitor(self, seller, term=10):
-        sql = "select dama_platform,status,count(1) as count,avg(TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(UNIX_TIMESTAMP(start_time)), FROM_UNIXTIME(UNIX_TIMESTAMP(end_time)))) as spendtime from pass_code_records where created>=DATE_SUB(NOW(),INTERVAL %s MINUTE) and seller='%s' and status!=0 group by dama_platform,status" % (int(term), seller)
+        seller_list = "','".join(seller)
+        seller_list = "('" + seller_list + "')"
+
+        sql = "select dama_platform,status,count(1) as count,avg(TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(UNIX_TIMESTAMP(start_time)), FROM_UNIXTIME(UNIX_TIMESTAMP(end_time)))) as spendtime from pass_code_records where created>=DATE_SUB(NOW(),INTERVAL %s MINUTE) and seller in %s and status!=0 group by dama_platform,status" % (int(term), seller_list)
         res = self.db.query(sql)
         logging.debug('[normal_monitor]%s', sql)
 
         return res
 
     def get_all_platform(self, seller):
-        sql = "select * from `pass_code_config` where seller='%s' order by seller_platform,seller,scene" % seller
+
+        seller_list = "','".join(seller)
+        seller_list = "('" + seller_list + "')"
+
+
+        sql = "select * from `pass_code_config` where seller in %s order by seller_platform,seller,scene" % seller_list
         res = self.db.query(sql)
 
         return res

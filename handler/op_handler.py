@@ -9,8 +9,9 @@ from biz.yundama_biz import YunDamaBusiness
 from biz.dama2_biz import Dama2Business
 from biz.ruokuai_biz import RuokuaiBusiness
 import cjson
-import tornado
+import tornado.web
 import logging
+import base64
 
 class OpLoginHandler(OpBaseHandler):
     '''
@@ -43,16 +44,18 @@ class OpLoginProcessHandler(OpBaseHandler):
             return
 
         if username == 'yunhu':
-            seller = 'yh'
+            seller = ['yh']
         elif username == 'duhang':
-            seller = 'dh'
+            seller = ['dh']
         elif username == 'common':
-            seller = 'common'
+            seller = ['common']
+        elif username == 'admin':
+            seller = ['yh','dh','common']
         else:
             self.redirect('/op/login?errmsg=账号密码错误')
             return
 
-        self.set_cookie('op_server_seller', seller)
+        self.set_cookie('op_server_seller', base64.b32encode(cjson.encode(seller)))
         self.redirect('/op/platform_view')
         return
 
@@ -69,7 +72,7 @@ class OpPlatformViewHandler(OpBaseHandler):
         op_biz = OpBusiness(db=self.db)
         errmsg = self.get_argument('errmsg',None)
         flag = self.get_argument('flag',None)
-        seller = self.get_cookie('op_server_seller')
+        seller = cjson.decode(base64.b32decode(self.get_cookie('op_server_seller')))
 
         # 余额信息查询
         #balance = self.redis.get(BaseBusiness.REDIS_KEY_TOTAL)
@@ -105,7 +108,7 @@ class OpRunningMonitorHandler(OpBaseHandler):
         op_config = config['op']
         monitor_term = op_config['monitor_term']
         op_biz = OpBusiness(db=self.db)
-        seller = self.get_cookie('op_server_seller')
+        seller = cjson.decode(base64.b32decode(self.get_cookie('op_server_seller')))
 
         # 获取数据
         monitor_data = op_biz.normal_monitor(seller=seller, term=monitor_term)
@@ -129,7 +132,7 @@ class OpRunningMonitorHandler(OpBaseHandler):
         logging.debug(balance)
         if balance:
             balance = cjson.decode(balance)
-            balance = balance.get(seller)
+            balance = balance.get('yh')
         else:
             balance = {}
 

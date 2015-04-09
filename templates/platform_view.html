@@ -138,19 +138,19 @@
 					<!-- #section:custom/checkbox -->
 						<div class="checkbox">
 							<label>
-								<input name="seller" type="checkbox" class="ace" value="yh" {% if seller != 'yh' %} disabled {% end %}>
+								<input name="seller" type="checkbox" class="ace" value="yh" {% if 'yh' not in seller %} disabled {% end %}>
 								<span class="lbl">YH</span>
 							</label>
 						</div>
 						<div class="checkbox">
 							<label>
-								<input name="seller" type="checkbox" class="ace" value="dh" {% if seller != 'dh' %} disabled {% end %}>
+								<input name="seller" type="checkbox" class="ace" value="dh" {% if 'dh' not in seller %} disabled {% end %}>
 								<span class="lbl">DH</span>
 							</label>
 						</div>
 						<div class="checkbox">
 							<label>
-								<input name="seller" type="checkbox" class="ace" value="common" {% if seller != 'common' %} disabled {% end %}>
+								<input name="seller" type="checkbox" class="ace" value="common" {% if 'common' not in seller %} disabled {% end %}>
 								<span class="lbl">登陆保持(common)</span>
 							</label>
 						</div>
