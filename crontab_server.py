@@ -105,8 +105,12 @@ class CrontabServer(object):
 
     def balance_start(self):
         while True:
-            self.balance()
-            time.sleep(60*1)
+            try:
+                self.balance()
+            except:
+                logging.error(traceback.format_exc())
+            finally:
+                time.sleep(60*1)
 
 
 def signal_handler(signal, frame):
