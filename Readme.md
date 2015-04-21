@@ -9,3 +9,11 @@
 
 ## 配置文件约定
 * config_master.ini 为线服务主配置文件，需存入git库。 上线后应复制为config_online.ini。程序中对于主配置文件，只读取config_online.ini。
+
+## 命名约定
+
+###后缀：
+> 类型：_type
+> 代码：_code
+> 编å·：_no
+> 数量：_num
